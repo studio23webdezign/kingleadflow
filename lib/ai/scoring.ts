@@ -9,7 +9,15 @@ export function scoreLead(
   inquiry: ExtractedInquiry,
   context: ContractorContext,
 ) {
-  const serviceNeed = inquiry.service_requested.trim() ? 20 : inquiry.summary.trim() ? 12 : 0;
+  const requestedService = inquiry.service_requested.trim().toLowerCase();
+  const configuredServices = context.services.map((service) => service.trim().toLowerCase()).filter(Boolean);
+  const serviceNeed = !requestedService
+    ? (inquiry.summary.trim() ? 12 : 0)
+    : configuredServices.length === 0
+      ? 20
+      : configuredServices.some((service) => requestedService.includes(service) || service.includes(requestedService))
+        ? 20
+        : 8;
   const contactCompleteness =
     (inquiry.contact_name.trim() ? 5 : 0) +
     (inquiry.email.trim() ? 8 : 0) +
@@ -33,7 +41,7 @@ export function scoreLead(
     score,
     priority,
     reasons: [
-      `Service need: ${serviceNeed}/20 — ${inquiry.service_requested.trim() ? "a specific service was identified" : inquiry.summary.trim() ? "a project need was described, but the service is unclear" : "no clear project need was identified"}.`,
+      `Service need: ${serviceNeed}/20 — ${requestedService ? (configuredServices.length === 0 ? "a service was identified; no service catalogue is configured" : serviceNeed === 20 ? "the requested service matches the configured catalogue" : "the requested service does not match the configured catalogue") : inquiry.summary.trim() ? "a project need was described, but the service is unclear" : "no clear project need was identified"}.`,
       `Contact completeness: ${contactCompleteness}/20 — name, email and phone details were checked.`,
       `Service-area fit: ${serviceAreaMatch}/20 — ${context.serviceAreas.length ? (serviceAreaMatch === 20 ? "the inquiry mentions a configured service area" : serviceAreaMatch === 0 ? "the location could not be matched to configured service areas" : "location fit is not yet clear") : "no service areas are configured, so a neutral score was used"}.`,
       `Urgency: ${urgency}/20 — classified as ${inquiry.urgency}.`,
