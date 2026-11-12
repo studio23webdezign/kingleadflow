@@ -33,6 +33,7 @@ export default async function DashboardPage() {
       <p className="text-xs font-semibold tracking-[0.24em] text-lime-300">SECURE WORKSPACE</p>
       <h1 className="mt-3 text-4xl font-semibold">Your command centre</h1>
       <p className="mt-3 max-w-2xl text-slate-400">Your account and workspace membership are verified on the server.</p>
+      <div className="mt-8 flex flex-wrap gap-3"><Link href="/dashboard/clients" className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-lime-300 hover:bg-white/5">Agency client directory →</Link><Link href="/dashboard/profile" className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-lime-300 hover:bg-white/5">Contractor business profiles →</Link><Link href="/dashboard/leads" className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-lime-300 hover:bg-white/5">Lead pipeline →</Link></div>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Account</p><p className="mt-2 break-all font-medium">{accountEmail}</p></div>
         <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Workspaces</p><p className="mt-2 text-2xl font-semibold">{organizations?.length ?? 0}</p></div>
