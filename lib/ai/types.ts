@@ -12,6 +12,6 @@ export const extractedInquirySchema = z.object({
   summary: z.string().max(1200),
   suggested_reply: z.string().max(1200),
   confidence: z.number().min(0).max(1),
-});
+}).strict();
 
 export type ExtractedInquiry = z.infer<typeof extractedInquirySchema>;
