@@ -18,6 +18,7 @@ export default async function DashboardPage() {
   if (membershipError) throw new Error("We could not load your workspace memberships.");
   if (!memberships || memberships.length === 0) redirect("/onboarding");
 
+  const accountEmail = typeof data?.claims?.email === "string" ? data.claims.email : "Verified user";
   const organizationIds = memberships.map((membership) => membership.organization_id);
   const { data: organizations, error: organizationError } = await supabase
     .from("organizations").select("id, name, kind, slug").in("id", organizationIds);
@@ -33,7 +34,7 @@ export default async function DashboardPage() {
       <h1 className="mt-3 text-4xl font-semibold">Your command centre</h1>
       <p className="mt-3 max-w-2xl text-slate-400">Your account and workspace membership are verified on the server.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Account</p><p className="mt-2 break-all font-medium">{typeof data.claims.email === "string" ? data.claims.email : "Verified user"}</p></div>
+        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Account</p><p className="mt-2 break-all font-medium">{accountEmail}</p></div>
         <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Workspaces</p><p className="mt-2 text-2xl font-semibold">{organizations?.length ?? 0}</p></div>
       </div>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
