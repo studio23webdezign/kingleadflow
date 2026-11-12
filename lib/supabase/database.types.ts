@@ -56,6 +56,15 @@ export type Database = {
           },
         ]
       }
+      agency_client_invitations: {
+        Row: { accepted_at: string | null; accepted_by: string | null; agency_organization_id: string; contractor_organization_id: string | null; created_at: string; expires_at: string; id: string; invited_by: string; invited_email: string; status: string };
+        Insert: { accepted_at?: string | null; accepted_by?: string | null; agency_organization_id: string; contractor_organization_id?: string | null; created_at?: string; expires_at?: string; id?: string; invited_by: string; invited_email: string; status?: string };
+        Update: { accepted_at?: string | null; accepted_by?: string | null; agency_organization_id?: string; contractor_organization_id?: string | null; created_at?: string; expires_at?: string; id?: string; invited_by?: string; invited_email?: string; status?: string };
+        Relationships: [
+          { foreignKeyName: "agency_client_invitations_agency_organization_id_fkey"; columns: ["agency_organization_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
+          { foreignKeyName: "agency_client_invitations_contractor_organization_id_fkey"; columns: ["contractor_organization_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
+        ];
+      }
       appointment_requests: {
         Row: {
           contractor_organization_id: string
