@@ -19,7 +19,7 @@ export default async function DashboardPage() {
       <h1 className="mt-3 text-4xl font-semibold">Your command centre</h1>
       <p className="mt-3 max-w-2xl text-slate-400">You are signed in. The next onboarding step will connect your account to an agency or contractor workspace.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Account</p><p className="mt-2 break-all font-medium">{data.claims.email ?? "Verified user"}</p></div>
+        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Account</p><p className="mt-2 break-all font-medium">{typeof data.claims.email === "string" ? data.claims.email : "Verified user"}</p></div>
         <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Workspaces</p><p className="mt-2 text-2xl font-semibold">{memberships?.length ?? 0}</p></div>
       </div>
       {memberships?.length === 0 && <p className="mt-6 rounded-xl border border-lime-300/20 bg-lime-300/5 p-4 text-sm text-slate-300">No workspace has been assigned yet. Workspace creation and invitations will be added in the onboarding sprint.</p>}
