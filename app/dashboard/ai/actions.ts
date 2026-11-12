@@ -28,10 +28,20 @@ export async function qualifyInquiry(formData: FormData) {
     supabase.from("organization_memberships").select("organization_id")
       .eq("organization_id", organizationId).eq("user_id", userId)
       .in("role", ["contractor_owner", "contractor_staff"]).maybeSingle(),
-    supabase.from("agency_clients").select("id")
+    supabase.from("agency_clients").select("agency_organization_id")
       .eq("contractor_organization_id", organizationId).eq("status", "active").limit(1).maybeSingle(),
   ]);
-  if (!ownMembership && !agencyLink) redirect("/dashboard/ai?error=workspace");
+
+  // The agency_clients query is RLS-filtered, but explicitly verify the user's
+  // agency role as a second authorization check before processing customer data.
+  let agencyMembership = null;
+  if (agencyLink?.agency_organization_id) {
+    const { data } = await supabase.from("organization_memberships").select("organization_id")
+      .eq("organization_id", agencyLink.agency_organization_id).eq("user_id", userId)
+      .in("role", ["agency_owner", "agency_admin", "agency_manager", "agency_staff"]).maybeSingle();
+    agencyMembership = data;
+  }
+  if (!ownMembership && !agencyMembership) redirect("/dashboard/ai?error=workspace");
 
   const { data: profile } = await supabase.from("contractor_profiles")
     .select("business_name,services,service_areas")
