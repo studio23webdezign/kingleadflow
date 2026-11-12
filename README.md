@@ -38,12 +38,13 @@ RLS is enabled on every application table. Anonymous table privileges are revoke
 
 ## Project status
 
-- Sprint 1: foundation and CI — implemented.
-- Sprint 2: multi-tenant schema, indexes, same-tenant foreign keys, and least-privilege grants — applied to the development Supabase project. End-to-end RLS tests are still required.
-- Sprint 3: email/password authentication, confirmation callback, protected dashboard, generated database types, and agency/contractor workspace onboarding — implementation in progress; CI and live auth-flow tests are pending.
-- AI inquiry extraction, intent classification, suggested receptionist replies, and deterministic five-factor lead scoring — implemented in the development code; Gemini key and end-to-end test required.
-- Contractor invitation workflow — implemented; invitations are manually shared until email delivery is integrated.
-- Integrations and production deployment — planned.
+- Sprint 1: Next.js foundation, landing page, repository setup, and GitHub Actions CI — implemented; earlier CI runs passed.
+- Sprint 2: multi-tenant schema, indexes, same-tenant foreign keys, least-privilege grants, and RLS — applied to the development Supabase project. Security advisor is clean; two-account end-to-end isolation tests remain.
+- Sprint 3: email/password authentication, confirmation callback, protected dashboard, generated database types, and agency/contractor workspace onboarding — implemented; live signup and confirmation testing remains.
+- Sprint 4: lead pipeline, lead details, activity timeline, and follow-up tasks — implemented; event writes are not yet wrapped with lead writes in a database transaction.
+- Sprint 5: agency client directory, contractor profiles, and contractor-owner invitation acceptance — implemented. Invitation security is tightened with column-level grants and RLS; invitation email delivery remains planned.
+- Sprint 6: Gemini inquiry extraction, intent classification, human-reviewed reply drafts, and deterministic five-factor lead scoring — implemented in code. Add a server-side Gemini API key and pass CI plus end-to-end testing before calling it verified.
+- Sprint 7: email/calendar, advertising, WhatsApp integrations, and production deployment — planned.
 
 ## Product principles
 
