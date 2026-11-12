@@ -9,6 +9,6 @@ export default async function DashboardLayout({ children }: Readonly<{ children:
   const { data, error } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
   if (error || typeof userId !== "string") redirect("/login");
-  const email = typeof data.claims.email === "string" ? data.claims.email : "Verified user";
+  const email = typeof data?.claims?.email === "string" ? data.claims.email : "Verified user";
   return <DashboardShell email={email}>{children}</DashboardShell>;
 }
