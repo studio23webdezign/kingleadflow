@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const capabilities = [
   { number: "01", title: "Capture every opportunity", description: "Bring website enquiries and campaign leads into one organised workspace." },
   { number: "02", title: "Respond with context", description: "An AI receptionist will qualify enquiries and collect the details your team needs." },
@@ -8,10 +10,10 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-8 sm:px-10">
       <header className="flex items-center justify-between border-b border-white/10 pb-6">
-        <a href="/" className="flex items-center gap-3" aria-label="KING LEADFLOW AI home">
+        <Link href="/" className="flex items-center gap-3" aria-label="KING LEADFLOW AI home">
           <span className="grid size-10 place-items-center rounded-xl bg-lime-300 font-black text-slate-950">K</span>
           <span className="text-sm font-bold tracking-[0.18em]">KING <span className="text-lime-300">LEADFLOW</span> AI</span>
-        </a>
+        </Link>
         <span className="rounded-full border border-lime-300/25 px-3 py-1 text-xs font-medium text-lime-200">MVP IN DEVELOPMENT</span>
       </header>
 
