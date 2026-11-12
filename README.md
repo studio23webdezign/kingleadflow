@@ -34,13 +34,13 @@ Never commit secrets. Do not expose Supabase secret/service-role keys to the bro
 
 Migrations live in `supabase/migrations`. Apply them in version order. The current schema includes organizations, memberships, agency-client relationships, contractor profiles, leads, lead events, follow-up tasks, and appointment requests.
 
-RLS is enabled on every application table. Anonymous table privileges are revoked; authenticated table privileges are granted per table using least privilege. Organization and membership provisioning remains server-controlled. Keep tenant IDs out of trusted authorization decisions: derive access from the verified user and membership records.
+RLS is enabled on every application table. Anonymous table privileges are revoked; authenticated table privileges are granted per table using least privilege. Organization and membership provisioning is handled by a SECURITY INVOKER RPC and ownership-constrained RLS policies. Keep tenant IDs out of trusted authorization decisions: derive access from the verified user and membership records.
 
 ## Project status
 
 - Sprint 1: foundation and CI — implemented.
 - Sprint 2: multi-tenant schema, indexes, same-tenant foreign keys, and least-privilege grants — applied to the development Supabase project. End-to-end RLS tests are still required.
-- Sprint 3: email/password authentication and protected dashboard — initial implementation in progress.
+- Sprint 3: email/password authentication, confirmation callback, protected dashboard, generated database types, and agency/contractor workspace onboarding — implementation in progress; CI and live auth-flow tests are pending.
 - AI, lead workflows, integrations, and production deployment — planned.
 
 ## Product principles
