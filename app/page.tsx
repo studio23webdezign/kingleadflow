@@ -27,8 +27,8 @@ export default function Home() {
             One command centre for agencies managing contractor clients. Capture leads, qualify conversations and keep every follow-up moving.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <span className="rounded-xl bg-lime-300 px-5 py-3 text-sm font-bold text-slate-950">Built for agencies</span>
-            <span className="text-sm text-slate-500">Independent platform · Multi-client ready</span>
+            <Link href="/signup" className="rounded-xl bg-lime-300 px-5 py-3 text-sm font-bold text-slate-950">Create account</Link>
+            <Link href="/login" className="rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-slate-200">Sign in</Link>
           </div>
         </div>
 
