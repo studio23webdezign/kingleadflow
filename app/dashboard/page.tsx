@@ -40,7 +40,7 @@ export default async function DashboardPage() {
         {organizations?.map((organization) => <article key={organization.id} className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
           <p className="text-xs uppercase tracking-wider text-lime-300">{organization.kind}</p>
           <h2 className="mt-2 text-xl font-semibold">{organization.name}</h2>
-          <p className="mt-1 text-sm text-slate-500">/{organization.slug}</p>
+          <p className="mt-1 text-sm text-slate-500">/{organization.slug}</p><Link href="/dashboard/leads" className="mt-4 inline-flex rounded-lg border border-lime-300/30 px-3 py-2 text-sm font-semibold text-lime-300 hover:bg-lime-300/10">Open lead pipeline →</Link>
         </article>)}
       </div>
     </section>
