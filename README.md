@@ -7,7 +7,7 @@ Independent, agency-first lead management and AI receptionist platform for agenc
 - Next.js 16 App Router + TypeScript
 - Tailwind CSS
 - Supabase PostgreSQL, Auth, and Row Level Security
-- Gemini through a provider abstraction (planned)
+- Gemini Interactions API behind a server-only provider boundary (active MVP provider)
 - Render hosting (planned)
 
 ## Local development
@@ -41,7 +41,9 @@ RLS is enabled on every application table. Anonymous table privileges are revoke
 - Sprint 1: foundation and CI — implemented.
 - Sprint 2: multi-tenant schema, indexes, same-tenant foreign keys, and least-privilege grants — applied to the development Supabase project. End-to-end RLS tests are still required.
 - Sprint 3: email/password authentication, confirmation callback, protected dashboard, generated database types, and agency/contractor workspace onboarding — implementation in progress; CI and live auth-flow tests are pending.
-- AI, lead workflows, integrations, and production deployment — planned.
+- AI inquiry extraction, intent classification, suggested receptionist replies, and deterministic five-factor lead scoring — implemented in the development code; Gemini key and end-to-end test required.
+- Contractor invitation workflow — implemented; invitations are manually shared until email delivery is integrated.
+- Integrations and production deployment — planned.
 
 ## Product principles
 
@@ -51,3 +53,7 @@ RLS is enabled on every application table. Anonymous table privileges are revoke
 - Appointment requests are not treated as confirmed bookings.
 - Follow-ups are task-based until consent-aware messaging integrations exist.
 - Demo data must be fictional unless explicit permission is granted.
+
+## AI qualification setup
+
+Add `GEMINI_API_KEY` from Google AI Studio to the server environment. Optionally set `GEMINI_MODEL` (defaults to `gemini-3.8-flash`). The key must never use a `NEXT_PUBLIC_` prefix. The server sends structured-output requests through Gemini's Interactions API with `store: false`; application-side Zod validation and deterministic scoring run before a lead is saved. Suggested replies are drafts only and are never sent automatically.
