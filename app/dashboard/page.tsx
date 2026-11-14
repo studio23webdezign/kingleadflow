@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, ArrowUpRight, BarChart3, Building2, CalendarDays, CheckCircle2, CirclePlus, Flame, Funnel, Sparkles, Target, UsersRound, Zap } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BarChart3, CalendarDays, CheckCircle2, CirclePlus, Flame, Funnel, Sparkles, UsersRound, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { HeroRobot, TargetIllustration } from "./dashboard-illustrations";
 
