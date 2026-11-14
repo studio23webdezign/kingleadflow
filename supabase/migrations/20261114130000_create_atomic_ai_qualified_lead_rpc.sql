@@ -28,7 +28,7 @@ begin
 
   if p_contractor_organization_id is null
     or p_score is null or p_score < 0 or p_score > 100
-    or p_priority not in ('low', 'medium', 'high')
+    or p_priority is null or p_priority not in ('low', 'medium', 'high')
     or jsonb_typeof(coalesce(p_score_reasons, '[]'::jsonb)) <> 'array'
     or jsonb_typeof(coalesce(p_event_payload, '{}'::jsonb)) <> 'object'
     or length(coalesce(p_description, '')) > 8000 then
