@@ -22,8 +22,6 @@ function LeadChart({leads,qualified,won}:{leads:number[];qualified:number[];won:
   const points=(values:number[])=>values.map((n,i)=>`${i*700/Math.max(1,values.length-1)},${148-n/max*120}`).join(" ");
   return <article className="rounded-[20px] border border-blue-300/[.12] bg-gradient-to-br from-[#14213c] to-[#0e1930] p-5 sm:p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><BarChart3 size={24} className="text-cyan-300"/><div><h2 className="text-base font-semibold text-white">Lead Performance</h2><p className="text-[10px] text-slate-500">Your last 30 days</p></div></div><span className="rounded-xl border border-blue-300/15 bg-[#0a1530] px-3 py-2 text-[10px] text-slate-300">Last 30 Days⌄</span></div><div className="mt-4 flex justify-end gap-5 text-[10px] text-slate-300"><span className="flex items-center gap-2"><i className="size-2 rounded-full bg-sky-500"/>Leads</span><span className="flex items-center gap-2"><i className="size-2 rounded-full bg-violet-500"/>Qualified</span></div><svg viewBox="0 0 760 190" className="mt-2 h-[190px] w-full" role="img" aria-label="Lead and qualified lead activity"><g>{[28,68,108,148].map((y,i)=><g key={y}><line x1="40" x2="750" y1={y} y2={y} stroke="#294064" strokeOpacity=".7"/><text x="4" y={y+4} fill="#93a4bd" fontSize="11">{Math.round(max*(3-i)/3)}</text></g>)}{[40,215,390,565,750].map(x=><line key={x} x1={x} x2={x} y1="20" y2="148" stroke="#294064" strokeOpacity=".4"/>)}</g><polyline points={points(leads)} transform="translate(40 0)" fill="none" stroke="#0ea5e9" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/><polyline points={points(qualified)} transform="translate(40 0)" fill="none" stroke="#a855f7" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/><line x1="40" x2="750" y1="148" y2="148" stroke="#365071"/>{["30d ago","20d ago","10d ago","Today"].map((l,i)=><text key={l} x={40+i*236} y="177" fill="#91a4c2" fontSize="11" textAnchor={i===0?"start":i===3?"end":"middle"}>{l}</text>)}</svg><div className="mt-2 flex gap-5 border-t border-white/[.06] pt-3 text-[10px] text-slate-400"><span>{leads.reduce((a,b)=>a+b,0)} new leads</span><span>{qualified.reduce((a,b)=>a+b,0)} qualified</span><span>{won} won overall</span></div></article>;
 }
-function Badge({status}:{status:string}) { const good=["won","qualified","appointment_booked"].includes(status); return <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${good?"border-emerald-400/20 bg-emerald-400/10 text-emerald-300":status==="lost"?"border-rose-400/20 bg-rose-400/10 text-rose-300":"border-blue-400/20 bg-blue-400/10 text-blue-300"}`}>{statusNames[status]??status}</span>; }
-
 export default async function DashboardPage() {
   const supabase=await createClient();
   const {data,error}=await supabase.auth.getClaims();
@@ -39,6 +37,8 @@ export default async function DashboardPage() {
   const contractorIds=(orgs??[]).filter(o=>o.kind==="contractor").map(o=>o.id);
   const {data:links}=agencyIds.length?await supabase.from("agency_clients").select("contractor_organization_id").in("agency_organization_id",agencyIds).eq("status","active"):{data:[]};
   const workspaceIds=[...new Set([...contractorIds,...(links??[]).map(x=>x.contractor_organization_id)])];
+  // Server-rendered dashboard query window is intentionally anchored to request time.
+  // eslint-disable-next-line react-hooks/purity
   const since=new Date(Date.now()-30*86400000).toISOString();
   const [allCount,qCount,wonCount,recentRows,activityRows]=await Promise.all([
     workspaceIds.length?supabase.from("leads").select("id",{count:"exact",head:true}).in("contractor_organization_id",workspaceIds):Promise.resolve({count:0,error:null}),
@@ -49,6 +49,7 @@ export default async function DashboardPage() {
   ]);
   const total=allCount.count??0, qualified=qCount.count??0, won=wonCount.count??0, active=(links??[]).length;
   const daily=Array(8).fill(0) as number[], dailyQ=Array(8).fill(0) as number[];
+  // eslint-disable-next-line react-hooks/purity
   for(const lead of activityRows.data??[]){const age=Math.max(0,Date.now()-new Date(lead.created_at).getTime());const bucket=Math.min(7,7-Math.floor(age/(30*86400000/8)));daily[bucket]++;if(qualifiedStatuses.includes(lead.status))dailyQ[bucket]++;}
   const recent=recentRows.data??[];
   return <div className="space-y-5 sm:space-y-6">
