@@ -2,51 +2,157 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import {
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Building2,
+  ChevronDown,
+  Crown,
+  LayoutDashboard,
+  Menu,
+  Search,
+  Sparkles,
+  UsersRound,
+  X,
+} from "lucide-react";
 
-const nav = [
-  { href: "/dashboard", label: "Dashboard", icon: "home" },
-  { href: "/dashboard/leads", label: "Leads", icon: "users" },
-  { href: "/dashboard/ai", label: "AI Assistant", icon: "sparkles" },
-  { href: "/dashboard/clients", label: "Clients", icon: "building" },
-  { href: "/dashboard/profile", label: "Business profiles", icon: "briefcase" },
+const navigation = [
+  {
+    label: "WORKSPACE",
+    items: [
+      { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+      { href: "/dashboard/leads", label: "Lead pipeline", icon: UsersRound },
+    ],
+  },
+  {
+    label: "GROWTH TOOLS",
+    items: [
+      { href: "/dashboard/ai", label: "AI receptionist", icon: Sparkles, accent: true },
+      { href: "/dashboard/clients", label: "Client workspaces", icon: Building2 },
+      { href: "/dashboard/profile", label: "Business profiles", icon: BriefcaseBusiness },
+    ],
+  },
 ];
 
-function Glyph({ name, size = 19 }: { name: string; size?: number }) {
-  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "currentColor", "aria-hidden": true as const };
-  const paths: Record<string, ReactNode> = {
-    home: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/><path d="M2 10 12 2l10 8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>,
-    users: <><path d="M16 21v-1.5a4.5 4.5 0 0 0-4.5-4.5h-5A4.5 4.5 0 0 0 2 19.5V21z"/><circle cx="9" cy="7" r="4"/><path d="M16 3.2a4 4 0 0 1 0 7.6M17 15h.5a4.5 4.5 0 0 1 4.5 4.5V21h-4"/></>,
-    sparkles: <><path d="m12 2 1.7 6.3L20 10l-6.3 1.7L12 18l-1.7-6.3L4 10l6.3-1.7z"/><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9zM5 2l.7 1.8L7.5 4.5l-1.8.7L5 7l-.7-1.8-1.8-.7 1.8-.7z"/></>,
-    building: <><path d="M3 21V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v16z"/><path d="M16 10h3a2 2 0 0 1 2 2v9h-5" /><path d="M7 7h2m3 0h1M7 11h2m3 0h1M7 15h2m3 0h1" stroke="#071326" strokeWidth="1.5" strokeLinecap="round"/></>,
-    briefcase: <><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></>,
-    bell: <><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></>,
-    search: <><circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" strokeWidth="2.2"/><path d="m16 16 5 5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></>,
-    chart: <><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></>,
-    calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18" fill="none" stroke="#071326" strokeWidth="1.7" strokeLinecap="round"/><path d="M8 14h2m4 0h2m-8 3h2" stroke="#071326" strokeWidth="1.7" strokeLinecap="round"/></>,
-    logout: <><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5v-2H5V5h5z"/><path d="m15 7 5 5-5 5v-3H9v-4h6z"/></>,
-  };
-  return <svg {...common}>{paths[name] ?? paths.sparkles}</svg>;
+function Brand() {
+  return (
+    <Link href="/dashboard" className="flex items-center gap-3 px-3 py-5" aria-label="KING LEADFLOW AI">
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-950/30">
+        <Crown size={21} fill="currentColor" strokeWidth={1.7} />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[13px] font-extrabold tracking-[.13em] text-white">KING</span>
+        <span className="block text-[10px] font-semibold tracking-[.17em] text-blue-300">LEADFLOW AI</span>
+      </span>
+    </Link>
+  );
 }
 
 export function DashboardShell({ children, email }: { children: ReactNode; email: string }) {
   const pathname = usePathname();
-  return <div className="app-shell">
-    <aside className="sidebar">
-      <Link href="/dashboard" className="brand-lockup"><span className="brand-crown">♛</span><span>KING</span><small>LEADFLOW AI</small></Link>
-      <div className="sidebar-label">WORKSPACE</div>
-      <nav className="side-nav">{nav.map((item) => {
-        const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-        return <Link key={item.href} href={item.href} className={`nav-link ${active ? "active" : ""}`}><Glyph name={item.icon}/><span>{item.label}</span>{active && <i/>}</Link>;
-      })}</nav>
-      <div className="upgrade-card"><span className="upgrade-crown">♛</span><strong>Upgrade to Pro</strong><p>Unlock more features and grow faster.</p><Link href="/dashboard/clients">Explore features <span>→</span></Link></div>
-      <div className="sidebar-account"><div className="avatar">{email.slice(0,1).toUpperCase()}</div><div className="account-copy"><strong>{email.split("@")[0]}</strong><small>Marketing Agency</small></div></div>
-      <Link href="/login" className="signout-link"><Glyph name="logout"/> Sign out</Link>
-    </aside>
-    <div className="main-column">
-      <header className="topbar"><div className="mobile-brand">♛ <b>KING LEADFLOW AI</b></div><div className="searchbox"><Glyph name="search" size={20}/><span>Search leads, clients, or campaigns...</span><kbd>⌘ K</kbd></div><div className="topbar-right"><button className="icon-button" aria-label="Notifications"><Glyph name="bell" size={20}/><i/></button><div className="top-user"><div className="avatar">{email.slice(0,1).toUpperCase()}</div><div><strong>{email.split("@")[0]}</strong><small>Marketing Agency</small></div><span>⌄</span></div></div></header>
-      <main className="dashboard-content">{children}</main>
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const initials = email.slice(0, 1).toUpperCase();
+  const displayName = email.split("@")[0] || "Workspace member";
+
+  const sidebar = (
+    <>
+      <Brand />
+      <div className="mt-5 space-y-7 px-3">
+        {navigation.map((group) => (
+          <section key={group.label}>
+            <p className="mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-slate-500">{group.label}</p>
+            <nav className="space-y-1">
+              {group.items.map((item) => {
+                const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={active
+                      ? "group flex h-11 items-center gap-3 rounded-xl border border-blue-400/20 bg-blue-500/15 px-3 text-sm font-semibold text-blue-200 shadow-sm"
+                      : "group flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-400 transition hover:bg-white/[.05] hover:text-white"}
+                  >
+                    <Icon size={18} strokeWidth={2.1} className={active ? "text-blue-300" : "text-slate-500 group-hover:text-slate-200"} />
+                    <span>{item.label}</span>
+                    {item.accent && <span className="ml-auto rounded-md bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-violet-300">AI</span>}
+                    {active && !item.accent && <span className="ml-auto size-1.5 rounded-full bg-blue-400" />}
+                  </Link>
+                );
+              })}
+            </nav>
+          </section>
+        ))}
+      </div>
+      <div className="mt-auto p-4">
+        <div className="rounded-2xl border border-blue-400/15 bg-gradient-to-br from-blue-500/15 to-violet-500/10 p-4">
+          <div className="mb-3 grid size-8 place-items-center rounded-lg bg-blue-500/20 text-blue-200">
+            <Sparkles size={17} fill="currentColor" />
+          </div>
+          <p className="text-xs font-semibold text-white">Make every lead count</p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-400">Use AI qualification to prioritise the enquiries that matter.</p>
+          <Link href="/dashboard/ai" onClick={() => setMobileOpen(false)} className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-300 hover:text-blue-200">
+            Open AI receptionist <ArrowUpRight size={13} />
+          </Link>
+        </div>
+        <div className="mt-4 flex items-center gap-3 border-t border-white/[.07] pt-4">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full border border-blue-300/20 bg-blue-500/20 text-xs font-bold text-blue-100">{initials}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-xs font-semibold text-slate-200">{displayName}</span>
+            <span className="block text-[10px] text-slate-500">Workspace member</span>
+          </span>
+          <ChevronDown size={15} className="text-slate-500" />
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#0b1220] text-slate-100">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[252px] flex-col border-r border-white/[.07] bg-[#0e1728] lg:flex">
+        {sidebar}
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="absolute inset-0 bg-black/70" />
+          <aside className="relative flex h-full w-[290px] max-w-[85vw] flex-col border-r border-white/10 bg-[#0e1728] shadow-2xl">
+            <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="absolute right-3 top-5 z-10 rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white"><X size={19} /></button>
+            {sidebar}
+          </aside>
+        </div>
+      )}
+
+      <div className="min-h-screen lg:pl-[252px]">
+        <header className="sticky top-0 z-20 flex h-[72px] items-center gap-4 border-b border-white/[.07] bg-[#0b1220]/90 px-4 backdrop-blur-xl sm:px-7">
+          <button onClick={() => setMobileOpen(true)} aria-label="Open navigation" className="grid size-9 place-items-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 lg:hidden">
+            <Menu size={19} />
+          </button>
+          <div className="hidden items-center gap-2 text-xs text-slate-500 sm:flex">
+            <span className="font-medium text-slate-300">KING LEADFLOW AI</span>
+            <span>/</span>
+            <span>{pathname === "/dashboard" ? "Overview" : navigation.flatMap((g) => g.items).find((i) => pathname.startsWith(i.href))?.label ?? "Workspace"}</span>
+          </div>
+          <div className="ml-auto flex items-center gap-3 sm:gap-5">
+            <div className="hidden h-9 w-[230px] items-center gap-2 rounded-xl border border-white/[.08] bg-white/[.03] px-3 text-xs text-slate-500 xl:flex">
+              <Search size={15} />
+              <span>Search your workspace</span>
+              <kbd className="ml-auto rounded border border-white/10 px-1.5 py-0.5 text-[9px]">⌘ K</kbd>
+            </div>
+            <span className="hidden rounded-full border border-emerald-400/15 bg-emerald-400/[.07] px-3 py-1.5 text-[10px] font-semibold text-emerald-300 sm:inline-flex">Workspace secure</span>
+            <div className="flex items-center gap-2.5 border-l border-white/[.08] pl-3 sm:pl-5">
+              <span className="grid size-9 place-items-center rounded-full border border-blue-300/20 bg-blue-500/20 text-xs font-bold text-blue-100">{initials}</span>
+              <span className="hidden max-w-[150px] sm:block">
+                <span className="block truncate text-xs font-semibold text-slate-200">{displayName}</span>
+                <span className="block text-[10px] text-slate-500">Signed in</span>
+              </span>
+            </div>
+          </div>
+        </header>
+        <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-7 sm:py-8">{children}</main>
+      </div>
     </div>
-    <nav className="mobile-nav">{nav.slice(0,4).map((item) => <Link key={item.href} href={item.href} className={pathname === item.href ? "selected" : ""}><Glyph name={item.icon} size={20}/><span>{item.label === "AI Assistant" ? "AI" : item.label}</span></Link>)}</nav>
-  </div>;
+  );
 }
