@@ -60,9 +60,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
     <div className="space-y-7">
       <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-[10px] font-bold tracking-[.18em] text-blue-300">SALES WORKSPACE</p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[30px]">Lead pipeline</h1>
-          <p className="mt-1.5 text-sm text-slate-400">Capture, review and move customer enquiries forward.</p>
+          <p className="app-page-kicker">SALES WORKSPACE</p>
+          <h1 className="app-page-title">Lead pipeline</h1>
+          <p className="app-page-copy">Capture, review and move customer enquiries forward.</p>
         </div>
         <a href="#create-lead" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500">
           <Plus size={15} /> Add a lead
@@ -83,7 +83,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           { label: "Won", value: won, detail: "Successfully closed", icon: Trophy, tone: "text-emerald-300 bg-emerald-500/15" },
         ].map((item) => {
           const Icon = item.icon;
-          return <article key={item.label} className="rounded-2xl border border-white/[.07] bg-[#111c2e] p-4">
+          return <article key={item.label} className="app-surface p-4">
             <div className="flex items-center gap-3">
               <span className={"grid size-10 place-items-center rounded-xl " + item.tone}><Icon size={19} /></span>
               <div><p className="text-[11px] text-slate-400">{item.label}</p><p className="mt-0.5 text-xl font-semibold text-white">{item.value.toLocaleString("en-ZA")}</p></div>
@@ -94,24 +94,24 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       </section>
 
       <div className="grid items-start gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
-        <form id="create-lead" action={createLead} className="rounded-2xl border border-white/[.07] bg-[#111c2e] p-5">
+        <form id="create-lead" action={createLead} className="app-surface p-5">
           <div className="mb-5 flex items-center gap-3">
             <span className="grid size-9 place-items-center rounded-xl bg-blue-500/15 text-blue-300"><Plus size={18} /></span>
             <div><h2 className="text-sm font-semibold text-white">Add a lead</h2><p className="mt-0.5 text-[10px] text-slate-500">Create a new customer record</p></div>
           </div>
           <label className="block text-[11px] font-medium text-slate-300">Contractor workspace
-            <select name="contractorOrganizationId" required className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white">
+            <select name="contractorOrganizationId" required className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white">
               {workspaces.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
             </select>
           </label>
           <div className="mt-4 space-y-3">
-            <label className="block text-[11px] font-medium text-slate-300">Contact name<input name="contactName" maxLength={160} placeholder="e.g. Jordan Smith" className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
-            <label className="block text-[11px] font-medium text-slate-300">Email<input name="email" type="email" maxLength={254} placeholder="jordan@example.com" className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
-            <label className="block text-[11px] font-medium text-slate-300">Phone<input name="phone" maxLength={40} placeholder="+27 ..." className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
-            <label className="block text-[11px] font-medium text-slate-300">Service requested<input name="serviceRequested" maxLength={160} placeholder="Roof repair" className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
-            <label className="block text-[11px] font-medium text-slate-300">Notes<textarea name="description" maxLength={3000} rows={3} placeholder="Project details..." className="mt-2 w-full resize-y rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
+            <label className="block text-[11px] font-medium text-slate-300">Contact name<input name="contactName" maxLength={160} placeholder="e.g. Jordan Smith" className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
+            <label className="block text-[11px] font-medium text-slate-300">Email<input name="email" type="email" maxLength={254} placeholder="jordan@example.com" className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
+            <label className="block text-[11px] font-medium text-slate-300">Phone<input name="phone" maxLength={40} placeholder="+27 ..." className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
+            <label className="block text-[11px] font-medium text-slate-300">Service requested<input name="serviceRequested" maxLength={160} placeholder="Roof repair" className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
+            <label className="block text-[11px] font-medium text-slate-300">Notes<textarea name="description" maxLength={3000} rows={3} placeholder="Project details..." className="mt-2 w-full resize-y rounded-xl app-field px-3 py-2.5 text-xs text-white placeholder:text-slate-600" /></label>
             <label className="block text-[11px] font-medium text-slate-300">Lead source
-              <select name="source" className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 py-2.5 text-xs text-white">
+              <select name="source" className="mt-2 w-full rounded-xl app-field px-3 py-2.5 text-xs text-white">
                 {["manual", "website_form", "api", "import", "ai_receptionist", "meta_lead_ads", "google_ads", "whatsapp", "other"].map((source) => <option key={source} value={source}>{source.replaceAll("_", " ")}</option>)}
               </select>
             </label>
@@ -122,7 +122,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           {!workspaces.length && <p className="mt-3 text-[10px] leading-5 text-slate-500">Create a contractor workspace or connect a contractor client to begin.</p>}
         </form>
 
-        <section className="overflow-hidden rounded-2xl border border-white/[.07] bg-[#111c2e]">
+        <section className="overflow-hidden app-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[.07] px-5 py-4">
             <div><h2 className="text-sm font-semibold text-white">All leads</h2><p className="mt-1 text-[10px] text-slate-500">Latest 100 records visible to your account</p></div>
             <span className="rounded-lg border border-white/10 bg-white/[.03] px-2.5 py-1.5 text-[10px] font-medium text-slate-400">{rows.length} records</span>
@@ -151,7 +151,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <span className={"rounded-full border px-2.5 py-1 text-[9px] font-semibold " + statusStyle(lead.status)}>{lead.status.replaceAll("_", " ")}</span>
                     <form action={updateLeadStatus} className="flex items-center gap-1.5">
                       <input type="hidden" name="leadId" value={lead.id} />
-                      <select name="status" defaultValue={lead.status} aria-label={"Status for " + (lead.contact_name || lead.email || "lead")} className="max-w-[130px] rounded-lg border border-white/10 bg-[#0b1220] px-2 py-2 text-[10px] text-slate-300">
+                      <select name="status" defaultValue={lead.status} aria-label={"Status for " + (lead.contact_name || lead.email || "lead")} className="max-w-[130px] rounded-lg app-field px-2 py-2 text-[10px] text-slate-300">
                         {statuses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                       </select>
                       <button aria-label="Update lead status" className="grid size-8 place-items-center rounded-lg border border-white/10 text-slate-400 transition hover:border-blue-400/30 hover:text-blue-300"><ArrowUpRight size={14} /></button>
