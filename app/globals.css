@@ -13,3 +13,27 @@ button,a{-webkit-tap-highlight-color:transparent}
 .quick-action span{font-size:11px;font-weight:600}
 .quick-action:hover{transform:translateY(-2px);border-color:rgb(96 165 250 / .45);background:linear-gradient(145deg,rgb(36 69 130 / .85),rgb(36 35 91 / .85))}
 .metric-card{box-shadow:0 12px 32px rgb(0 0 0 / .16)}
+
+/* Sprint 2 shared visual language */
+:root{--kl-bg:#080f20;--kl-panel:#101c32;--kl-border:rgba(119,170,255,.14);--kl-blue:#1765f5;--kl-cyan:#24c9f4;--kl-violet:#8b5cf6;--kl-muted:#91a2bd}
+.app-surface{border:1px solid var(--kl-border);border-radius:20px;background:linear-gradient(145deg,rgba(20,34,61,.96),rgba(12,23,43,.98));box-shadow:0 16px 42px rgba(0,0,0,.14)}
+.app-surface-soft{border:1px solid rgba(119,170,255,.1);border-radius:16px;background:rgba(17,29,51,.78)}
+.app-page-kicker{font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:#79b8ff}
+.app-page-title{margin-top:8px;font-size:clamp(25px,3vw,32px);font-weight:700;line-height:1.15;letter-spacing:-.04em;color:#f8fbff}
+.app-page-copy{margin-top:8px;max-width:720px;font-size:13px;line-height:1.8;color:#91a2bd}
+.app-field{width:100%;min-width:0;border:1px solid rgba(137,174,230,.17);border-radius:12px;background:#09152a;color:#f1f6ff;outline:none;transition:border-color .18s,box-shadow .18s}
+.app-field:focus{border-color:rgba(56,145,255,.8);box-shadow:0 0 0 3px rgba(37,99,235,.13)}
+.app-field::placeholder{color:#64748b}
+.app-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid rgba(120,180,255,.25);border-radius:12px;background:linear-gradient(110deg,#1265f5,#3159e9 58%,#6b39db);color:white;font-weight:700;box-shadow:0 9px 24px rgba(22,85,220,.22);transition:filter .18s,transform .18s}
+.app-primary:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.app-auth-shell{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 14% 18%,rgba(20,104,255,.18),transparent 34%),radial-gradient(ellipse at 88% 82%,rgba(117,47,230,.18),transparent 32%),#080f20}
+.app-auth-panel{border:1px solid rgba(119,170,255,.18);border-radius:26px;background:linear-gradient(145deg,rgba(18,33,59,.96),rgba(10,20,39,.98));box-shadow:0 24px 80px rgba(0,0,0,.32)}
+.app-auth-brand{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.15em;color:#fff}
+.app-auth-brand:before{content:"♛";display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#1677ff,#713ce5);font-size:22px;letter-spacing:0;box-shadow:0 8px 24px rgba(37,99,235,.25)}
+.app-auth-kicker{font-size:10px;font-weight:800;letter-spacing:.2em;color:#83baff}
+.app-auth-title{margin-top:12px;font-size:30px;font-weight:700;letter-spacing:-.04em;color:#fff}
+.app-auth-copy{margin-top:8px;font-size:13px;line-height:1.75;color:#93a5c0}
+.app-auth-field{display:block;width:100%;margin-top:8px;border:1px solid rgba(137,174,230,.18);border-radius:12px;background:#08152a;padding:12px 14px;color:white;outline:none}
+.app-auth-field:focus{border-color:#398cff;box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+.app-auth-submit{width:100%;border-radius:12px;background:linear-gradient(100deg,#1265f5,#593be2);padding:13px 18px;font-weight:700;color:white;box-shadow:0 10px 28px rgba(27,85,224,.2)}
+@media(max-width:640px){.app-surface{border-radius:17px}.app-page-title{font-size:26px}.app-auth-panel{border-radius:21px}}
