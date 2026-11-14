@@ -427,6 +427,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_ai_qualified_lead: {
+        Args: {
+          p_contractor_organization_id: string
+          p_contact_name: string
+          p_email: string
+          p_phone: string
+          p_service_requested: string
+          p_postal_code: string
+          p_description: string
+          p_score: number
+          p_priority: string
+          p_score_reasons: Json
+          p_event_payload: Json
+        }
+        Returns: string
+      }
       create_organization_for_current_user: {
         Args: { p_kind: string; p_name: string; p_slug: string }
         Returns: string

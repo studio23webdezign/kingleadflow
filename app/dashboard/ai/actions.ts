@@ -24,24 +24,21 @@ export async function qualifyInquiry(formData: FormData) {
   if (authError || typeof userId !== "string") redirect("/login");
 
   const organizationId = parsed.data.contractorOrganizationId;
-  const [{ data: ownMembership }, { data: agencyLink }] = await Promise.all([
-    supabase.from("organization_memberships").select("organization_id")
-      .eq("organization_id", organizationId).eq("user_id", userId)
-      .in("role", ["contractor_owner", "contractor_staff"]).maybeSingle(),
-    supabase.from("agency_clients").select("agency_organization_id")
-      .eq("contractor_organization_id", organizationId).eq("status", "active").limit(1).maybeSingle(),
-  ]);
+  const { data: ownMembership } = await supabase.from("organization_memberships").select("organization_id")
+    .eq("organization_id", organizationId).eq("user_id", userId)
+    .in("role", ["contractor_owner", "contractor_staff"]).maybeSingle();
 
-  // The agency_clients query is RLS-filtered, but explicitly verify the user's
-  // agency role as a second authorization check before processing customer data.
-  let agencyMembership = null;
-  if (agencyLink?.agency_organization_id) {
-    const { data } = await supabase.from("organization_memberships").select("organization_id")
-      .eq("organization_id", agencyLink.agency_organization_id).eq("user_id", userId)
-      .in("role", ["agency_owner", "agency_admin", "agency_manager", "agency_staff"]).maybeSingle();
-    agencyMembership = data;
+  const { data: agencyLinks } = await supabase.from("agency_clients").select("agency_organization_id")
+    .eq("contractor_organization_id", organizationId).eq("status", "active");
+  const agencyOrganizationIds = (agencyLinks ?? []).map((link) => link.agency_organization_id);
+  let hasAgencyMembership = false;
+  if (agencyOrganizationIds.length > 0) {
+    const { data: agencyMemberships } = await supabase.from("organization_memberships").select("organization_id")
+      .in("organization_id", agencyOrganizationIds).eq("user_id", userId)
+      .in("role", ["agency_owner", "agency_admin", "agency_manager", "agency_staff"]);
+    hasAgencyMembership = (agencyMemberships?.length ?? 0) > 0;
   }
-  if (!ownMembership && !agencyMembership) redirect("/dashboard/ai?error=workspace");
+  if (!ownMembership && !hasAgencyMembership) redirect("/dashboard/ai?error=workspace");
 
   const { data: profile } = await supabase.from("contractor_profiles")
     .select("business_name,services,service_areas")
@@ -63,28 +60,18 @@ export async function qualifyInquiry(formData: FormData) {
 
   const score = scoreLead(extracted, { services, serviceAreas });
   const email = z.string().email().safeParse(extracted.email);
-  const { data: lead, error: insertError } = await supabase.from("leads").insert({
-    contractor_organization_id: organizationId,
-    contact_name: extracted.contact_name || null,
-    email: email.success ? email.data : null,
-    phone: extracted.phone || null,
-    service_requested: extracted.service_requested || null,
-    postal_code: extracted.postal_code || null,
-    description: parsed.data.message,
-    source: "ai_receptionist",
-    score: score.score,
-    priority: score.priority,
-    score_reasons: score.reasons,
-  }).select("id").single();
-
-  if (insertError || !lead) redirect("/dashboard/ai?error=save");
-
-  const { error: eventError } = await supabase.from("lead_events").insert({
-    contractor_organization_id: organizationId,
-    lead_id: lead.id,
-    actor_user_id: userId,
-    event_type: "ai_qualified",
-    payload: {
+  const { data: leadId, error: saveError } = await supabase.rpc("create_ai_qualified_lead", {
+    p_contractor_organization_id: organizationId,
+    p_contact_name: extracted.contact_name,
+    p_email: email.success ? email.data : "",
+    p_phone: extracted.phone,
+    p_service_requested: extracted.service_requested,
+    p_postal_code: extracted.postal_code,
+    p_description: parsed.data.message,
+    p_score: score.score,
+    p_priority: score.priority,
+    p_score_reasons: score.reasons,
+    p_event_payload: {
       intent: extracted.intent,
       summary: extracted.summary,
       suggested_reply: extracted.suggested_reply,
@@ -95,6 +82,6 @@ export async function qualifyInquiry(formData: FormData) {
     },
   });
 
-  if (eventError) redirect(`/dashboard/leads/${lead.id}?aiEventError=1`);
-  redirect(`/dashboard/leads/${lead.id}?ai=1`);
+  if (saveError || typeof leadId !== "string") redirect("/dashboard/ai?error=save");
+  redirect(`/dashboard/leads/${leadId}?ai=1`);
 }
