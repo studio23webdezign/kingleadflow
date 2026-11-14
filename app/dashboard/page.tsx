@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Building2,
+  BriefcaseBusiness,
   CheckCircle2,
   CirclePlus,
   Clock3,
