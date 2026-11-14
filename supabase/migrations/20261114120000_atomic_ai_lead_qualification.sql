@@ -101,7 +101,7 @@ end;
 $$;
 
 revoke all on function public.create_ai_qualified_lead(
-  uuid, text, text, text, text, text, smallint, text, jsonb, jsonb
+  uuid, text, text, text, text, text, text, smallint, text, jsonb, jsonb
 ) from public, anon;
 
 grant execute on function public.create_ai_qualified_lead(
