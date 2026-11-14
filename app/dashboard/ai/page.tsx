@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { BrainCircuit, CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { qualifyInquiry } from "./actions";
+import { HeroRobot } from "../dashboard-illustrations";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +59,8 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
         </form>
 
         <aside className="space-y-3">
-          <section className="rounded-2xl border border-violet-400/15 bg-gradient-to-br from-violet-500/[.12] to-[#111c2e] p-5">
+          <section className="app-surface overflow-hidden bg-gradient-to-br from-[#102d63] via-[#171b56] to-[#27144d] p-5">
+            <div className="mx-auto -mb-1 h-36 max-w-[250px]"><HeroRobot /></div>
             <span className="grid size-9 place-items-center rounded-xl bg-violet-500/20 text-violet-200"><Sparkles size={18} fill="currentColor" /></span>
             <h2 className="mt-4 text-sm font-semibold text-white">From enquiry to opportunity</h2>
             <p className="mt-2 text-[11px] leading-5 text-slate-400">AI helps structure the conversation so your team can focus on the next best action.</p>
@@ -69,7 +71,7 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-300" /> Draft a reply for human review</li>
             </ul>
           </section>
-          <section className="rounded-2xl border border-amber-400/15 bg-amber-400/[.04] p-4">
+          <section className="app-surface-soft p-4">
             <p className="text-[10px] font-semibold text-amber-200">Human approval required</p>
             <p className="mt-1.5 text-[10px] leading-5 text-slate-400">Suggested replies are drafts only. This action does not send email or WhatsApp messages, or book appointments.</p>
           </section>
