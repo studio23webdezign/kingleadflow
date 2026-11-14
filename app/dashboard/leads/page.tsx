@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowUpRight, Building2, Flame, Plus, Target, Trophy, UsersRound } from "lucide-react";
+import { ArrowUpRight, Flame, Plus, Target, Trophy, UsersRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createLead, updateLeadStatus } from "./actions";
 
