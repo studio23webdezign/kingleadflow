@@ -7,11 +7,9 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   Building2,
-  ChevronDown,
   Crown,
   LayoutDashboard,
   Menu,
-  Search,
   Sparkles,
   UsersRound,
   X,
@@ -103,7 +101,6 @@ export function DashboardShell({ children, email }: { children: ReactNode; email
             <span className="block truncate text-xs font-semibold text-slate-200">{displayName}</span>
             <span className="block text-[10px] text-slate-500">Workspace member</span>
           </span>
-          <ChevronDown size={15} className="text-slate-500" />
         </div>
       </div>
     </>
@@ -136,12 +133,6 @@ export function DashboardShell({ children, email }: { children: ReactNode; email
             <span>{pathname === "/dashboard" ? "Overview" : navigation.flatMap((g) => g.items).find((i) => pathname.startsWith(i.href))?.label ?? "Workspace"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3 sm:gap-5">
-            <div className="hidden h-9 w-[230px] items-center gap-2 rounded-xl border border-white/[.08] bg-white/[.03] px-3 text-xs text-slate-500 xl:flex">
-              <Search size={15} />
-              <span>Search your workspace</span>
-              <kbd className="ml-auto rounded border border-white/10 px-1.5 py-0.5 text-[9px]">⌘ K</kbd>
-            </div>
-            <span className="hidden rounded-full border border-emerald-400/15 bg-emerald-400/[.07] px-3 py-1.5 text-[10px] font-semibold text-emerald-300 sm:inline-flex">Workspace secure</span>
             <div className="flex items-center gap-2.5 border-l border-white/[.08] pl-3 sm:pl-5">
               <span className="grid size-9 place-items-center rounded-full border border-blue-300/20 bg-blue-500/20 text-xs font-bold text-blue-100">{initials}</span>
               <span className="hidden max-w-[150px] sm:block">
