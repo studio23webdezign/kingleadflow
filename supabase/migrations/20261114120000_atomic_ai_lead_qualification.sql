@@ -29,8 +29,10 @@ begin
     raise exception 'Authentication required' using errcode = '28000';
   end if;
 
-  if p_score is null or p_score < 0 or p_score > 100
-     or p_priority not in ('low', 'medium', 'high')
+  if p_contractor_organization_id is null
+     or p_description is null or length(trim(p_description)) < 10 or length(p_description) > 8000
+     or p_score is null or p_score < 0 or p_score > 100
+     or p_priority is null or p_priority not in ('low', 'medium', 'high')
      or jsonb_typeof(coalesce(p_score_reasons, '[]'::jsonb)) <> 'array'
      or jsonb_typeof(coalesce(p_event_payload, '{}'::jsonb)) <> 'object' then
     raise exception 'Invalid lead qualification data' using errcode = '22023';
