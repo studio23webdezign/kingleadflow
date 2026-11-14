@@ -16,7 +16,7 @@ create or replace function public.create_ai_qualified_lead(
 )
 returns uuid
 language plpgsql
-security definer
+security invoker
 set search_path = ''
 as $$
 declare
