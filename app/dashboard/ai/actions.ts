@@ -63,28 +63,18 @@ export async function qualifyInquiry(formData: FormData) {
 
   const score = scoreLead(extracted, { services, serviceAreas });
   const email = z.string().email().safeParse(extracted.email);
-  const { data: lead, error: insertError } = await supabase.from("leads").insert({
-    contractor_organization_id: organizationId,
-    contact_name: extracted.contact_name || null,
-    email: email.success ? email.data : null,
-    phone: extracted.phone || null,
-    service_requested: extracted.service_requested || null,
-    postal_code: extracted.postal_code || null,
-    description: parsed.data.message,
-    source: "ai_receptionist",
-    score: score.score,
-    priority: score.priority,
-    score_reasons: score.reasons,
-  }).select("id").single();
-
-  if (insertError || !lead) redirect("/dashboard/ai?error=save");
-
-  const { error: eventError } = await supabase.from("lead_events").insert({
-    contractor_organization_id: organizationId,
-    lead_id: lead.id,
-    actor_user_id: userId,
-    event_type: "ai_qualified",
-    payload: {
+  const { data: leadId, error: saveError } = await supabase.rpc("create_ai_qualified_lead", {
+    p_contractor_organization_id: organizationId,
+    p_contact_name: extracted.contact_name,
+    p_email: email.success ? email.data : "",
+    p_phone: extracted.phone,
+    p_service_requested: extracted.service_requested,
+    p_postal_code: extracted.postal_code,
+    p_description: parsed.data.message,
+    p_score: score.score,
+    p_priority: score.priority,
+    p_score_reasons: score.reasons,
+    p_event_payload: {
       intent: extracted.intent,
       summary: extracted.summary,
       suggested_reply: extracted.suggested_reply,
@@ -95,6 +85,6 @@ export async function qualifyInquiry(formData: FormData) {
     },
   });
 
-  if (eventError) redirect(`/dashboard/leads/${lead.id}?aiEventError=1`);
-  redirect(`/dashboard/leads/${lead.id}?ai=1`);
+  if (saveError || typeof leadId !== "string") redirect("/dashboard/ai?error=save");
+  redirect(`/dashboard/leads/${leadId}?ai=1`);
 }
