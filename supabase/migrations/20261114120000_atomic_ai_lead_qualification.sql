@@ -1,5 +1,5 @@
 -- Persist an AI-qualified lead and its audit event as one transaction.
--- The SECURITY DEFINER function performs its own tenant authorization check.
+-- SECURITY INVOKER preserves the caller's table privileges and row-level security.
 
 create or replace function public.create_ai_qualified_lead(
   p_contractor_organization_id uuid,
