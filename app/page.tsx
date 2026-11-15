@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Building2, CheckCircle2, Crown, Sparkles, UsersRound } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, Crown, Sparkles, UsersRound, Zap, ShieldCheck, Workflow } from "lucide-react";
+import { HeroRobot } from "@/app/dashboard/dashboard-illustrations";
 
 const capabilities = [
   { number: "01", title: "Capture every opportunity", description: "Bring website enquiries and campaign leads into one organised workspace.", icon: UsersRound },
@@ -9,7 +10,7 @@ const capabilities = [
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-5 py-6 sm:px-10 sm:py-8">
+    <main className="app-auth-shell mx-auto flex min-h-screen w-full max-w-[1600px] flex-col px-5 py-6 sm:px-10 sm:py-8">
       <header className="flex items-center justify-between border-b border-white/[.07] pb-5">
         <Link href="/" className="flex items-center gap-3" aria-label="KING LEADFLOW AI home">
           <span className="grid size-10 place-items-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-950/30"><Crown size={21} fill="currentColor" /></span>
@@ -36,7 +37,7 @@ export default function Home() {
 
         <div className="relative">
           <div className="absolute -inset-8 rounded-[36px] bg-blue-500/[.08] blur-3xl" />
-          <div className="relative overflow-hidden rounded-2xl border border-white/[.09] bg-[#111c2e] p-5 shadow-2xl shadow-black/30 sm:p-6">
+          <div className="app-surface relative overflow-hidden p-5 shadow-2xl shadow-black/30 sm:p-6"><div className="pointer-events-none absolute -right-4 -top-10 h-44 w-64 opacity-90 sm:h-52 sm:w-80"><HeroRobot /></div><div className="relative z-10">
             <div className="flex items-center justify-between border-b border-white/[.07] pb-4">
               <div><p className="text-[9px] font-bold tracking-[.16em] text-slate-500">WORKSPACE PREVIEW</p><h2 className="mt-1 text-sm font-semibold text-white">Agency command centre</h2></div>
               <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[.06] px-2.5 py-1 text-[9px] font-semibold text-emerald-300">Live workspace view</span>
@@ -50,7 +51,7 @@ export default function Home() {
                 {["Capture enquiry", "AI qualification", "Human-reviewed follow-up"].map((item, index) => <div key={item} className="flex items-center gap-3"><span className="grid size-6 place-items-center rounded-lg bg-blue-500/15 text-[9px] font-bold text-blue-200">0{index + 1}</span><span className="text-[10px] text-slate-300">{item}</span><CheckCircle2 size={13} className="ml-auto text-blue-300/70" /></div>)}
               </div>
             </div>
-            <p className="mt-4 text-[9px] leading-5 text-slate-600">Illustrative preview only. Workspace figures populate after account setup and data connection.</p>
+            <p className="mt-4 text-[9px] leading-5 text-slate-500">Illustrative preview only. Workspace figures populate after account setup and data connection.</p></div>
           </div>
         </div>
       </section>
@@ -58,13 +59,15 @@ export default function Home() {
       <section className="grid gap-3 border-t border-white/[.07] py-8 md:grid-cols-3">
         {capabilities.map((item) => {
           const Icon = item.icon;
-          return <article key={item.number} className="rounded-2xl border border-white/[.07] bg-[#111c2e]/70 p-5 transition hover:border-blue-400/20 hover:bg-[#111c2e]">
+          return <article key={item.number} className="app-surface p-5 transition hover:-translate-y-1 hover:border-blue-400/30">
             <div className="flex items-center justify-between"><span className="text-[10px] font-bold text-blue-300">{item.number}</span><Icon size={18} className="text-slate-500" /></div>
             <h2 className="mt-5 text-sm font-semibold text-white">{item.title}</h2>
             <p className="mt-2 text-[11px] leading-6 text-slate-400">{item.description}</p>
           </article>;
         })}
       </section>
+
+      <section className="app-surface mb-8 flex flex-col items-start justify-between gap-5 overflow-hidden p-6 sm:flex-row sm:items-center sm:p-8"><div><p className="app-page-kicker">READY TO TAKE CONTROL?</p><h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">Give every lead a clear next step.</h2><p className="mt-2 text-xs text-slate-400">Start with a workspace built around your agency and contractor relationships.</p></div><Link href="/signup" className="app-primary shrink-0 px-5 py-3 text-xs">Create your workspace <ArrowRight size={15}/></Link></section>
 
       <footer className="flex flex-wrap justify-between gap-3 border-t border-white/[.07] py-5 text-[10px] text-slate-600">
         <span>© {new Date().getFullYear()} KING LEADFLOW AI</span><span>Independent product · Early access</span>
