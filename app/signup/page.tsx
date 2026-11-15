@@ -17,5 +17,5 @@ export default async function SignupPage({ searchParams }: Props) {
         <button className="app-auth-submit">Create account</button>
       </form><p className="mt-6 text-sm text-slate-400">Already registered? <Link href="/login" className="font-semibold text-blue-300">Sign in</Link></p>
     </div>
-  </section></div></main>n>;
+  </section></div></main>;
 }
