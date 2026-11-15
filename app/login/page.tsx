@@ -17,5 +17,5 @@ export default async function LoginPage({ searchParams }: Props) {
       </form>
       <p className="mt-6 text-sm text-slate-400">New here? <Link href="/signup" className="font-semibold text-blue-300">Create an account</Link></p>
     </div><p className="mt-6 text-center text-xs text-slate-600">Independent platform · Early access</p>
-  </section></div></main>n>;
+  </section></div></main>;
 }
