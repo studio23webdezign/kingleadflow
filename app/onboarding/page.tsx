@@ -46,5 +46,5 @@ export default async function OnboardingPage({ searchParams }: Props) {
         <button className="app-auth-submit">Create workspace</button>
       </form>
     </div>
-  </section></div></main>n>;
+  </section></div></main>;
 }
