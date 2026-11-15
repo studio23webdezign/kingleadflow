@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroRobot } from "@/app/dashboard/dashboard-illustrations";
 import { redirect } from "next/navigation";
 import { createOrganization } from "@/app/onboarding/actions";
 import { signOut } from "@/app/auth/actions";
@@ -18,7 +19,7 @@ export default async function OnboardingPage({ searchParams }: Props) {
   if (membershipError) throw new Error("We could not verify your workspace membership.");
   if (memberships && memberships.length > 0) redirect("/dashboard");
 
-  return <main className="app-auth-shell flex min-h-screen w-full flex-col justify-center px-5 py-12 sm:px-6"><div className="mx-auto w-full max-w-xl">
+  return <main className="app-auth-shell flex min-h-screen w-full flex-col justify-center px-5 py-12 sm:px-6"><div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(400px,520px)]"><section className="hidden min-w-0 lg:block"><p className="app-auth-kicker">ONE WORKSPACE. MORE MOMENTUM.</p><h2 className="mt-4 max-w-lg text-4xl font-bold leading-tight tracking-tight text-white">Build a better engine for your business.</h2><p className="mt-4 max-w-md text-sm leading-7 text-slate-400">Organise your leads, qualify enquiries and manage client workspaces from one place.</p><div className="mt-6 h-72 max-w-xl"><HeroRobot /></div></section><section className="mx-auto w-full max-w-xl">
     <header className="mb-8 flex items-center justify-between">
       <Link href="/" className="app-auth-brand">KING <span className="text-blue-300">LEADFLOW</span> AI</Link>
       <form action={signOut}><button className="text-sm text-slate-400 hover:text-white">Sign out</button></form>
@@ -45,5 +46,5 @@ export default async function OnboardingPage({ searchParams }: Props) {
         <button className="app-auth-submit">Create workspace</button>
       </form>
     </div>
-  </div></main>;
+  </section></div></main>n>;
 }
