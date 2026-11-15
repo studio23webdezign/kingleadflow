@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { HeroRobot } from "@/app/dashboard/dashboard-illustrations";
 import { signIn } from "@/app/auth/actions";
 type Props = { searchParams: Promise<{ error?: string }> };
 export default async function LoginPage({ searchParams }: Props) {
   const { error } = await searchParams;
-  return <main className="app-auth-shell flex min-h-screen w-full flex-col justify-center px-5 py-12 sm:px-6"><div className="mx-auto w-full max-w-md">
+  return <main className="app-auth-shell flex min-h-screen w-full flex-col justify-center px-5 py-12 sm:px-6"><div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)]"><section className="hidden min-w-0 lg:block"><p className="app-auth-kicker">YOUR GROWTH, UNDER CONTROL</p><h2 className="mt-4 max-w-lg text-4xl font-bold leading-tight tracking-tight text-white">Turn every enquiry into your next opportunity.</h2><p className="mt-4 max-w-md text-sm leading-7 text-slate-400">A smarter workspace for lead capture, qualification and client growth.</p><div className="mt-6 h-72 max-w-xl"><HeroRobot /></div></section><section className="mx-auto w-full max-w-md">
     <Link href="/" className="app-auth-brand mb-8">KING <span className="text-blue-300">LEADFLOW</span> AI</Link>
     <div className="app-auth-panel p-6 sm:p-8">
       <p className="app-auth-kicker">WELCOME BACK</p><h1 className="app-auth-title">Sign in</h1>
@@ -16,5 +17,5 @@ export default async function LoginPage({ searchParams }: Props) {
       </form>
       <p className="mt-6 text-sm text-slate-400">New here? <Link href="/signup" className="font-semibold text-blue-300">Create an account</Link></p>
     </div><p className="mt-6 text-center text-xs text-slate-600">Independent platform · Early access</p>
-  </div></main>;
+  </section></div></main>n>;
 }
