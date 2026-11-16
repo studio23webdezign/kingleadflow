@@ -27,7 +27,8 @@
 - The Google OAuth client must be configured and its redirect URI registered.
 - Incremental Gmail History API synchronization: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
 - Message/thread detail UI and human resolution of ambiguous lead matches.
-- Disconnect/revocation and calendar.
+- Gmail disconnect is implemented: workspace-admin authorization is rechecked, local mailbox access and the history cursor are disabled/cleared before best-effort Google token revocation; synced CRM messages and send audit records are retained. If provider revocation is unavailable, the UI directs the user to remove the app from Google Account third-party access settings.
+- Calendar.
 - Automated OAuth/provider tests, tenant-isolation tests, CI verification, and live end-to-end connection testing.
 
 ## Required server-side environment
