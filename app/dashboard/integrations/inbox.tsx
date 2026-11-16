@@ -16,7 +16,7 @@ type Message = {
   lead_id: string | null;
 };
 
-type Draft = { to: string; subject: string; textBody: string; threadId: string };
+type Draft = { to: string; subject: string; textBody: string; threadId: string; inReplyTo?: string };
 
 export function GmailInbox({ messages, organizationId, mailboxEmail }: {
   messages: Message[];
@@ -55,7 +55,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
       ? latest.to_addresses.find((address) => address.email?.toLowerCase() !== mailboxEmail.toLowerCase())?.email ?? ""
       : latest.from_email;
     const subject = /^re:/i.test(latest.subject) ? latest.subject : `Re: ${latest.subject}`;
-    setDraft({ to: recipient, subject, textBody: "", threadId });
+    setDraft({ to: recipient, subject, textBody: "", threadId, inReplyTo: latest.rfc_message_id ?? undefined });
     setConfirmed(false);
     setNotice(null);
   }
@@ -113,7 +113,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
               <p className="mt-1 text-[10px] text-slate-500">To: {message.to_addresses?.map((address) => address.email).filter(Boolean).join(", ") || "Not available"}</p>
               <p className="mt-3 whitespace-pre-wrap break-words text-xs leading-6 text-slate-300">{message.text_body || message.snippet || "Message body unavailable in the synced record."}</p>
             </div>)}
-            <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-[10px] text-slate-500">Replies are sent only after explicit recipient and send confirmation.</p><button type="button" onClick={() => startReply(thread.id, thread.messages)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-3 text-[11px] font-semibold text-white hover:bg-blue-500"><Send size={13}/> Reply</button></div>
+            <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-[10px] text-slate-500">Replies are sent only after explicit recipient and send confirmation. Older messages without a stored Message-ID are sent as a new email with the reply subject.</p><button type="button" onClick={() => startReply(thread.id, thread.messages)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-3 text-[11px] font-semibold text-white hover:bg-blue-500"><Send size={13}/> Reply</button></div>
           </div>}
         </article>;
       })}
