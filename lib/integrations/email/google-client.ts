@@ -71,7 +71,7 @@ async function loadConnection(organizationId: string) {
   if (error || !connection) {
     throw new GmailIntegrationError("No Gmail mailbox is connected to this workspace.", "not_connected");
   }
-  return { supabase, connection };
+  return { supabase, connection, userId };
 }
 
 /** Refreshes credentials server-side; encrypted tokens never leave this module. */
@@ -433,4 +433,52 @@ export async function syncGmailMessages(input: {
     historyCursorReset: historyExpired,
     lastSyncAt: new Date().toISOString(),
   };
+}
+
+
+/** Sends one plain-text message only after the authenticated route has recorded explicit approval. */
+export async function sendGoogleMessage(input: {
+  organizationId: string;
+  to: string;
+  subject: string;
+  textBody: string;
+}) {
+  const { connection } = await loadConnection(input.organizationId);
+  const accessToken = await getGoogleAccessToken(input.organizationId);
+  const safeTo = input.to.trim();
+  const safeSubject = input.subject.replace(/[\\r\\n]+/g, " ").trim();
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(safeTo) || /[\\r\\n]/.test(safeTo)) {
+    throw new GmailIntegrationError("Enter one valid recipient email address.", "invalid_response");
+  }
+  if (!safeSubject || !input.textBody.trim()) {
+    throw new GmailIntegrationError("A subject and message are required.", "invalid_response");
+  }
+  const mime = [
+    `To: ${safeTo}`,
+    `Subject: =?UTF-8?B?${Buffer.from(safeSubject, "utf8").toString("base64")}?=`,
+    "MIME-Version: 1.0",
+    "Content-Type: text/plain; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
+    "",
+    input.textBody.replace(/\\r?\\n/g, "\\r\\n"),
+  ].join("\\r\\n");
+  const raw = Buffer.from(mime, "utf8").toString("base64url");
+  const response = await fetch(`${GMAIL_API}/messages/send`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ raw }),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+    }
+    throw new GmailIntegrationError("Gmail did not accept the message.", "provider_error");
+  }
+  const result = await response.json() as { id?: string; threadId?: string };
+  if (!result.id) throw new GmailIntegrationError("Gmail returned no message ID.", "invalid_response");
+  return { providerMessageId: result.id, providerThreadId: result.threadId ?? null, mailbox: connection.provider_email };
 }
