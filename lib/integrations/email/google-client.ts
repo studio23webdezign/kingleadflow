@@ -279,6 +279,8 @@ export async function syncGmailMessages(input: {
       candidateHistoryId = profile.historyId ?? null;
     } else if (profileResponse.status === 401 || profileResponse.status === 403) {
       throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+    } else {
+      throw new GmailIntegrationError("Gmail could not establish a synchronization checkpoint.", "provider_error");
     }
     const params = new URLSearchParams({ maxResults: String(maxThreads) });
     if (input.query) params.set("q", input.query);
@@ -428,7 +430,7 @@ export async function syncGmailMessages(input: {
     linkedMessages,
     failedThreads,
     threadsProcessed: threadsToFetch.length,
-    nextPageToken: list.nextPageToken ?? null,
+    historyCursorReset: historyExpired,
     lastSyncAt: new Date().toISOString(),
   };
 }
