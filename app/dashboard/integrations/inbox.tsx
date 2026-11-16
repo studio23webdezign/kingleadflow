@@ -71,7 +71,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           organizationId,
-          approvalRequestId: crypto.randomUUID(),
+          approvalRequestId: draft.approvalRequestId,
           to: draft.to,
           subject: draft.subject,
           textBody: draft.textBody,
