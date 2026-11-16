@@ -33,6 +33,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "You do not have permission to disconnect this mailbox." }, { status: 403 });
   }
 
+  // Gmail tables are introduced by this branch migration and are not yet in generated Supabase types.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
   const { data: connection, error: connectionError } = await db
     .from("email_connections")
