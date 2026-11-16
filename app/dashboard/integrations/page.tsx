@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, Clock3, Mail, ShieldCheck, Unplug } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GmailSyncButton } from "./sync-button";
+import { GmailInbox } from "./inbox";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
     ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status,last_sync_at").in("organization_id", organizationIds).eq("provider","google")
     : { data: [] };
   const connection = connections?.[0];
+  const { data: syncedMessages } = connection
+    ? await db.from("gmail_messages").select("id,provider_thread_id,subject,from_name,from_email,to_addresses,snippet,text_body,received_at,lead_id").eq("email_connection_id", connection.id).order("received_at", { ascending: false }).limit(100)
+    : { data: [] };
 
   return <div className="mx-auto max-w-5xl space-y-7">
     <section>
