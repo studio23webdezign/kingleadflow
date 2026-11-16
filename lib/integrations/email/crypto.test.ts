@@ -32,7 +32,7 @@ describe("mailbox token encryption", () => {
     const encrypted = encryptMailboxTokens({ access_token: "secret", expires_at: 1 });
 
     const [iv, tag, ciphertext] = encrypted.split(".");
-    const changed = ciphertext.slice(0, -1) + (ciphertext.endsWith("A") ? "B" : "A");
+    const position = Math.floor(ciphertext.length / 2);\n    const changed = ciphertext.slice(0, position) + (ciphertext[position] === "A" ? "B" : "A") + ciphertext.slice(position + 1);
 
     expect(() => decryptMailboxTokens([iv, tag, changed].join("."))).toThrow();
   });
