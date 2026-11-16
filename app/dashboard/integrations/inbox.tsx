@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, MailSearch, Search, Send, X } from "lucide-reac
 type Message = {
   id: string;
   provider_thread_id: string;
+  rfc_message_id: string | null;
   subject: string;
   from_name: string | null;
   from_email: string;
@@ -75,6 +76,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
           to: draft.to,
           subject: draft.subject,
           textBody: draft.textBody,
+          ...(draft.inReplyTo ? { threadId: draft.threadId, inReplyTo: draft.inReplyTo } : {}),
           confirmRecipient: true,
           confirmSend: true,
         }),
