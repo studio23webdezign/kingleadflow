@@ -14,7 +14,7 @@ const schema = z.object({
   approvalRequestId: z.string().uuid(),
   to: z.string().trim().email().max(320),
   subject: z.string().trim().min(1).max(998),
-  textBody: z.string().trim().min(1).max(100000),
+  textBody: z.string().trim().min(1).max(100000),\n  threadId: z.string().optional(),\n  inReplyTo: z.string().optional(),
   confirmRecipient: z.literal(true),
   confirmSend: z.literal(true),
 });
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Sign in again before sending email." }, { status: 401 });
   }
 
-  const input = parsed.data;
+  const input = parsed.data;\n  if ((input.threadId && !input.inReplyTo) || (input.inReplyTo && !input.threadId) || (input.inReplyTo && /[\\r\\n]/.test(input.inReplyTo))) {\n    return NextResponse.json({ error: "The reply thread reference is invalid.", code: "invalid_thread" }, { status: 400 });\n  }
   const db = supabase as any;
   const { data: connection, error: connectionError } = await db
     .from("email_connections")
