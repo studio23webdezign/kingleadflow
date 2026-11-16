@@ -10,6 +10,15 @@
 6. Add Gmail integration settings, disconnect controls, audit events and provider tests.
 7. Display Outlook / Microsoft 365 as a clearly marked **Coming soon** placeholder. Do not expose a connect action or request Microsoft credentials yet.
 
+## Gmail connection foundation
+
+- Dashboard route: `/dashboard/integrations`; Outlook is displayed as Coming soon.
+- Google OAuth authorization-code flow uses PKCE, a short-lived HttpOnly state/verifier cookie, and a verified organization membership.
+- OAuth callback retrieves the Google account identity and stores tokens encrypted with AES-256-GCM in `email_connections`.
+- The migration `20261116120000_gmail_email_connections.sql` creates tenant-scoped connection records with RLS.
+- Connect is limited to agency owners, agency admins and contractor owners.
+- This is connection setup only: inbox sync, refresh-token lifecycle, disconnect/revocation, approved sending, and calendar are not yet implemented.
+
 ## Current foundation
 
 - `lib/integrations/email/types.ts` defines normalized addresses/messages and a provider adapter contract.
