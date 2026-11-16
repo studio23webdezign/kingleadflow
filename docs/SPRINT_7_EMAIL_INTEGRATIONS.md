@@ -25,7 +25,7 @@
 
 - The migrations `20261116120000_gmail_email_connections.sql`, `20261116150000_gmail_message_sync.sql`, and `20261116170000_link_gmail_messages_to_leads.sql` have been committed but must be applied to the development Supabase database.
 - The Google OAuth client must be configured and its redirect URI registered.
-- Incremental Gmail History API synchronization and durable history cursor checkpoints; current manual sync is a bounded recent-thread import.
+- Incremental Gmail History API synchronization: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
 - Message/thread detail UI and human resolution of ambiguous lead matches.
 - Human-approved outbound send flow, approval audit trail, disconnect/revocation, and calendar.
 - Automated OAuth/provider tests, tenant-isolation tests, CI verification, and live end-to-end connection testing.
