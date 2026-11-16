@@ -1,4 +1,4 @@
--- Gmail OAuth connection records. Secrets are encrypted by the application before storage.
+-- Gmail OAuth connection records. Tokens are encrypted by the application before storage.
 create table public.email_connections (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
@@ -19,16 +19,28 @@ alter table public.email_connections enable row level security;
 revoke all on public.email_connections from anon, authenticated;
 grant select, insert, update, delete on public.email_connections to authenticated;
 
-create policy "members can view organization email connections"
+-- Only workspace owners/admins may read connection metadata or encrypted token
+-- blobs. Do not grant ordinary members SELECT access to this table.
+create policy "workspace admins can view email connections"
 on public.email_connections for select to authenticated
 using (exists (
   select 1 from public.organization_memberships m
   where m.organization_id = email_connections.organization_id
     and m.user_id = (select auth.uid())
+    and m.role in ('agency_owner','agency_admin','contractor_owner')
 ));
 
-create policy "organization owners and admins manage email connections"
-on public.email_connections for all to authenticated
+create policy "workspace admins can insert email connections"
+on public.email_connections for insert to authenticated
+with check (exists (
+  select 1 from public.organization_memberships m
+  where m.organization_id = email_connections.organization_id
+    and m.user_id = (select auth.uid())
+    and m.role in ('agency_owner','agency_admin','contractor_owner')
+));
+
+create policy "workspace admins can update email connections"
+on public.email_connections for update to authenticated
 using (exists (
   select 1 from public.organization_memberships m
   where m.organization_id = email_connections.organization_id
@@ -36,6 +48,15 @@ using (exists (
     and m.role in ('agency_owner','agency_admin','contractor_owner')
 ))
 with check (exists (
+  select 1 from public.organization_memberships m
+  where m.organization_id = email_connections.organization_id
+    and m.user_id = (select auth.uid())
+    and m.role in ('agency_owner','agency_admin','contractor_owner')
+));
+
+create policy "workspace admins can delete email connections"
+on public.email_connections for delete to authenticated
+using (exists (
   select 1 from public.organization_memberships m
   where m.organization_id = email_connections.organization_id
     and m.user_id = (select auth.uid())
