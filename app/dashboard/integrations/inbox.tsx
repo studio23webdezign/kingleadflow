@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, MailSearch, Search, Send, X } from "lucide-react";
 
 type Message = {
@@ -60,7 +60,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
     setNotice(null);
   }
 
-  async function sendApprovedEmail(event: React.FormEvent<HTMLFormElement>) {
+  async function sendApprovedEmail(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft || !confirmed || sending) return;
     setSending(true);
