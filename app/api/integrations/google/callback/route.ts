@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     return fail(request, "encryption_configuration");
   }
 
-  const db = supabase as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is introduced by this branch migration and is not yet in generated DB types.\n  const db = supabase as any;
   const { error: saveError } = await db.from("email_connections").upsert({
     organization_id: organizationId,
     connected_by: userId,
