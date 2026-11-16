@@ -21,6 +21,12 @@ type GmailThreadList = {
   nextPageToken?: string;
   resultSizeEstimate?: number;
 };
+type GmailHistoryList = {
+  history?: Array<{ id: string; messagesAdded?: Array<{ message?: { id?: string; threadId?: string } }> }>;
+  historyId?: string;
+  nextPageToken?: string;
+};
+type GmailProfile = { emailAddress?: string; historyId?: string };
 
 export class GmailIntegrationError extends Error {
   constructor(
@@ -55,7 +61,7 @@ async function loadConnection(organizationId: string) {
   const db = supabase as any;
   const { data: connection, error } = await db
     .from("email_connections")
-    .select("id,organization_id,provider_email,encrypted_tokens,status")
+    .select("id,organization_id,provider_email,encrypted_tokens,status,last_sync_history_id")
     .eq("organization_id", organizationId)
     .eq("provider", "google")
     .eq("status", "connected")
@@ -227,25 +233,60 @@ export async function syncGmailMessages(input: {
   const { supabase, connection } = await loadConnection(input.organizationId);
   const accessToken = await getGoogleAccessToken(input.organizationId);
   const maxThreads = Math.min(Math.max(Math.floor(input.maxThreads ?? 15), 1), 25);
-  const listParams = new URLSearchParams({ maxResults: String(maxThreads) });
-  if (input.query) listParams.set("q", input.query);
+  const threadIds = new Set<string>();
+  let syncMode: "initial" | "incremental" | "search" = input.query ? "search" : "initial";
+  let candidateHistoryId: string | null = null;
+  let historyPageToken: string | undefined;
+  let historyExpired = false;
 
-  const listResponse = await fetch(`${GMAIL_API}/threads?${listParams}`, {
-    headers: { authorization: `Bearer ${accessToken}` },
-    cache: "no-store",
-  });
-  if (!listResponse.ok) {
-    if (listResponse.status === 401 || listResponse.status === 403) {
-      throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
-    }
-    throw new GmailIntegrationError("Gmail could not list threads for synchronization.", "provider_error");
+  // Gmail history cursors are valid only for a limited period. A 404 means
+  // the cursor expired; recover with a bounded recent-thread import.
+  if (connection.last_sync_history_id && !input.query) {
+    syncMode = "incremental";
+    do {
+      const params = new URLSearchParams({ startHistoryId: connection.last_sync_history_id, historyTypes: "messageAdded" });
+      if (historyPageToken) params.set("pageToken", historyPageToken);
+      const response = await fetch(`${GMAIL_API}/history?${params.toString()}`, {
+        headers: { authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      });
+      if (response.status === 404) { historyExpired = true; break; }
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+        throw new GmailIntegrationError("Gmail could not read mailbox history.", "provider_error");
+      }
+      const page = await response.json() as GmailHistoryList;
+      candidateHistoryId = page.historyId ?? candidateHistoryId;
+      for (const event of page.history ?? []) {
+        for (const added of event.messagesAdded ?? []) {
+          if (added.message?.threadId) threadIds.add(added.message.threadId);
+        }
+      }
+      historyPageToken = page.nextPageToken;
+    } while (historyPageToken);
   }
-  const list = await listResponse.json() as GmailThreadList;
+
+  if (!connection.last_sync_history_id || input.query || historyExpired) {
+    syncMode = input.query ? "search" : "initial";
+    const params = new URLSearchParams({ maxResults: String(maxThreads) });
+    if (input.query) params.set("q", input.query);
+    const response = await fetch(`${GMAIL_API}/threads?${params.toString()}`, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+      throw new GmailIntegrationError("Gmail could not list threads for synchronization.", "provider_error");
+    }
+    const list = await response.json() as GmailThreadList;
+    for (const item of (list.threads ?? []).slice(0, maxThreads)) threadIds.add(item.id);
+  }
+  const threadsToFetch = [...threadIds];
   let saved = 0;
   let failedThreads = 0;
 
-  for (const item of (list.threads ?? []).slice(0, maxThreads)) {
-    const threadResponse = await fetch(`${GMAIL_API}/threads/${encodeURIComponent(item.id)}?format=full`, {
+  for (const threadId of threadsToFetch) {
+    const threadResponse = await fetch(`${GMAIL_API}/threads/${encodeURIComponent(threadId)}?format=full`, {
       headers: { authorization: `Bearer ${accessToken}` },
       cache: "no-store",
     });
@@ -355,19 +396,38 @@ export async function syncGmailMessages(input: {
     }
   }
 
+  // Establish a baseline cursor after the initial/search import, or use the
+  // newest cursor returned by the fully paginated History API response.
+  if (!candidateHistoryId && syncMode !== "incremental") {
+    const profileResponse = await fetch(`${GMAIL_API}/profile`, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (profileResponse.ok) {
+      const profile = await profileResponse.json() as GmailProfile;
+      candidateHistoryId = profile.historyId ?? null;
+    } else if (profileResponse.status === 401 || profileResponse.status === 403) {
+      throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+    }
+  }
+
+  const checkpointUpdate: Record<string, unknown> = { last_sync_at: new Date().toISOString() };
+  // Never advance the history cursor if any thread failed; the next run will retry it.
+  if (candidateHistoryId && failedThreads === 0) checkpointUpdate.last_sync_history_id = candidateHistoryId;
   const { error: checkpointError } = await (supabase as any)
     .from("email_connections")
-    .update({ last_sync_at: new Date().toISOString() })
+    .update(checkpointUpdate)
     .eq("id", connection.id);
   if (checkpointError) {
-    throw new GmailIntegrationError("Messages were synced, but the sync timestamp could not be saved.", "provider_error");
+    throw new GmailIntegrationError("Messages were synced, but the sync checkpoint could not be saved.", "provider_error");
   }
 
   return {
+    syncMode,
     syncedMessages: saved,
     linkedMessages,
     failedThreads,
-    threadsProcessed: (list.threads ?? []).length,
+    threadsProcessed: threadsToFetch.length,
     nextPageToken: list.nextPageToken ?? null,
     lastSyncAt: new Date().toISOString(),
   };
