@@ -14,7 +14,9 @@ const schema = z.object({
   approvalRequestId: z.string().uuid(),
   to: z.string().trim().email().max(320),
   subject: z.string().trim().min(1).max(998),
-  textBody: z.string().trim().min(1).max(100000),\n  threadId: z.string().optional(),\n  inReplyTo: z.string().optional(),
+  textBody: z.string().trim().min(1).max(100000),
+  threadId: z.string().optional(),
+  inReplyTo: z.string().optional(),
   confirmRecipient: z.literal(true),
   confirmSend: z.literal(true),
 });
@@ -25,6 +27,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Confirm the recipient and message before sending.", code: "invalid_request" }, { status: 400 });
   }
 
+  const input = parsed.data;
+  if ((input.threadId && !input.inReplyTo) || (input.inReplyTo && !input.threadId) || (input.inReplyTo && /[\r\n]/.test(input.inReplyTo))) {
+    return NextResponse.json({ error: "The reply thread reference is invalid.", code: "invalid_thread" }, { status: 400 });
+  }
+
   const supabase = await createClient();
   const { data: claims, error: claimsError } = await supabase.auth.getClaims();
   const actorUserId = claims?.claims?.sub;
@@ -32,7 +39,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Sign in again before sending email." }, { status: 401 });
   }
 
-  const input = parsed.data;\n  if ((input.threadId && !input.inReplyTo) || (input.inReplyTo && !input.threadId) || (input.inReplyTo && /[\\r\\n]/.test(input.inReplyTo))) {\n    return NextResponse.json({ error: "The reply thread reference is invalid.", code: "invalid_thread" }, { status: 400 });\n  }
   const db = supabase as any;
   const { data: connection, error: connectionError } = await db
     .from("email_connections")
@@ -73,6 +79,8 @@ export async function POST(request: NextRequest) {
       to: input.to,
       subject: input.subject,
       textBody: input.textBody,
+      threadId: input.threadId,
+      inReplyTo: input.inReplyTo,
     });
     const { error: outcomeError } = await db.from("email_send_audit").update({
       status: "sent",
