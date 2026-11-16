@@ -416,7 +416,11 @@ export async function syncGmailMessages(input: {
 
   const checkpointUpdate: Record<string, unknown> = { last_sync_at: new Date().toISOString() };
   // Never advance the history cursor if any thread failed; the next run will retry it.
-  if (candidateHistoryId && failedThreads === 0) checkpointUpdate.last_sync_history_id = candidateHistoryId;
+  // Search imports are independent of the mailbox cursor; advancing it here could skip
+  // unrelated messages that arrived after the previous incremental checkpoint.
+  if (!input.query && candidateHistoryId && failedThreads === 0) {
+    checkpointUpdate.last_sync_history_id = candidateHistoryId;
+  }
   const { error: checkpointError } = await (supabase as any)
     .from("email_connections")
     .update(checkpointUpdate)
