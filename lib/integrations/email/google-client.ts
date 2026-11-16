@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Gmail tables are introduced by this branch migration and are not yet present in generated Supabase database types. */
+
 import "server-only";
 
 import { decryptMailboxTokens, encryptMailboxTokens } from "@/lib/integrations/email/crypto";
@@ -50,7 +52,6 @@ async function loadConnection(organizationId: string) {
     throw new GmailIntegrationError("You do not have permission to access this mailbox.", "not_connected");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email tables are introduced by this branch migration and are not yet in generated DB types.
   const db = supabase as any;
   const { data: connection, error } = await db
     .from("email_connections")
@@ -122,7 +123,6 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
     expires_at: Date.now() + (refreshed.expires_in ?? 3600) * 1000,
     scope: refreshed.scope ?? tokens.scope,
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
   const { error: updateError } = await (supabase as any)
     .from("email_connections")
     .update({ encrypted_tokens: encryptMailboxTokens(updatedTokens) })
@@ -290,7 +290,6 @@ export async function syncGmailMessages(input: {
     saved += rows.length;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
   const { error: checkpointError } = await (supabase as any)
     .from("email_connections")
     .update({ last_sync_at: new Date().toISOString() })
