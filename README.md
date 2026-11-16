@@ -44,7 +44,7 @@ RLS is enabled on every application table. Anonymous table privileges are revoke
 - Sprint 4: lead pipeline, lead details, activity timeline, and follow-up tasks — implemented; event writes are not yet wrapped with lead writes in a database transaction.
 - Sprint 5: agency client directory, contractor profiles, and contractor-owner invitation acceptance — implemented. Invitation security is tightened with column-level grants and RLS; invitation email delivery remains planned.
 - Sprint 6: Gemini inquiry extraction, intent classification, human-reviewed reply drafts, and deterministic five-factor lead scoring — implemented in code. Add a server-side Gemini API key and pass CI plus end-to-end testing before calling it verified.
-- Sprint 7: provider-neutral email integration foundation for Gmail and Microsoft 365 — added on `sprint-7-email-foundation`; OAuth flows, encrypted token storage, message sync, approval-based sending, and calendar integration remain in progress.
+- Sprint 7: Gmail / Google Workspace is the active email integration; Outlook / Microsoft 365 is a Coming soon placeholder only. Gmail OAuth, encrypted token storage, message sync, approval-based sending, and calendar integration remain in progress.
 
 ## Product principles
 
