@@ -20,10 +20,10 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   const { data: connections } = organizationIds.length
     ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status,last_sync_at").in("organization_id", organizationIds).eq("provider","google")
     : { data: [] };
+  const connection = connections?.[0];
   const { data: sendAudits } = connection
     ? await db.from("email_send_audit").select("id,recipient_email,subject,status,provider_message_id,approved_at,sent_at").eq("email_connection_id", connection.id).order("created_at", { ascending: false }).limit(20)
     : { data: [] };
-  const connection = connections?.[0];
   const { data: syncedMessages } = connection
     ? await db.from("gmail_messages").select("id,provider_thread_id,subject,rfc_message_id,from_name,from_email,to_addresses,snippet,text_body,received_at,lead_id").eq("email_connection_id", connection.id).order("received_at", { ascending: false }).limit(100)
     : { data: [] };
