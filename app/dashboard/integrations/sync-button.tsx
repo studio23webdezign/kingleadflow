@@ -18,7 +18,7 @@ export function GmailSyncButton({ organizationId }: { organizationId: string }) 
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Gmail synchronization failed.");
-      setMessage(`Synced ${result.syncedMessages} messages from ${result.threadsProcessed} threads.`);
+      setMessage(`Synced ${result.syncedMessages} messages from ${result.threadsProcessed} threads. ${result.failedThreads} thread(s) could not be imported.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Gmail synchronization failed.");
     } finally {
