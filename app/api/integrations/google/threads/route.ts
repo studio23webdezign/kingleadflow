@@ -13,12 +13,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "organization_id is required" }, { status: 400 });
   }
 
+  const requestedMax = Number(request.nextUrl.searchParams.get("max_results") ?? 20);
+  const maxResults = Number.isFinite(requestedMax) ? requestedMax : 20;
+
   try {
     const result = await listGmailThreads({
       organizationId,
       pageToken: request.nextUrl.searchParams.get("page_token") ?? undefined,
       query: request.nextUrl.searchParams.get("q") ?? undefined,
-      maxResults: Number(request.nextUrl.searchParams.get("max_results") ?? 20),
+      maxResults,
     });
     return NextResponse.json(result, {
       headers: { "Cache-Control": "private, no-store" },
