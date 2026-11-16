@@ -20,6 +20,9 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   const { data: connections } = organizationIds.length
     ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status,last_sync_at").in("organization_id", organizationIds).eq("provider","google")
     : { data: [] };
+  const { data: sendAudits } = connection
+    ? await db.from("email_send_audit").select("id,recipient_email,subject,status,provider_message_id,approved_at,sent_at").eq("email_connection_id", connection.id).order("created_at", { ascending: false }).limit(20)
+    : { data: [] };
   const connection = connections?.[0];
   const { data: syncedMessages } = connection
     ? await db.from("gmail_messages").select("id,provider_thread_id,subject,rfc_message_id,from_name,from_email,to_addresses,snippet,text_body,received_at,lead_id").eq("email_connection_id", connection.id).order("received_at", { ascending: false }).limit(100)
@@ -40,6 +43,16 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
       </div>
       {connection ? <div className="mt-6 rounded-xl border border-white/[.07] bg-[#0b1220] p-4"><p className="text-sm font-semibold text-white">{connection.provider_email}</p><p className="mt-1 text-[11px] text-slate-500">Connected {new Date(connection.connected_at).toLocaleString()}</p><p className="mt-1 text-[11px] text-slate-500">{connection.last_sync_at ? `Last sync ${new Date(connection.last_sync_at).toLocaleString()}` : "No messages synced yet"}</p><p className="mt-3 text-xs text-slate-400">Sync recent conversations into this workspace. Replies require recipient review, explicit approval, and audit logging. Nothing is sent automatically.</p><GmailSyncButton organizationId={connection.organization_id}/></div> : <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="max-w-xl text-xs leading-6 text-slate-400"><p>Google will ask you to approve mailbox access. AI-generated replies remain drafts and require your approval before sending.</p><p className="mt-2 inline-flex items-center gap-1.5 text-slate-500"><ShieldCheck size={13}/> OAuth tokens are encrypted at rest.</p></div><form action="/api/integrations/google/start" method="post"><button className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-xs font-semibold text-white transition hover:bg-blue-500"><Mail size={15}/> Connect Gmail</button></form></div>}
     </section>
+    {connection && <GmailInbox messages={syncedMessages ?? []} organizationId={connection.organization_id} mailboxEmail={connection.provider_email} />}
+    {connection && <section className="overflow-hidden rounded-2xl border border-white/[.07] bg-[#111c2e]">
+      <div className="border-b border-white/[.07] px-5 py-4"><h2 className="text-sm font-semibold text-white">Email send audit</h2><p className="mt-1 text-[10px] text-slate-500">Recent human-approved messages and their delivery outcomes.</p></div>
+      {!sendAudits?.length ? <p className="px-5 py-8 text-center text-xs text-slate-500">No approved email sends recorded yet.</p> : <div className="divide-y divide-white/[.06]">
+        {sendAudits.map((audit: { id: string; recipient_email: string; subject: string; status: string; approved_at: string }) => <div key={audit.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+          <div className="min-w-0"><p className="truncate text-xs font-semibold text-slate-200">{audit.subject}</p><p className="mt-1 truncate text-[10px] text-slate-500">To {audit.recipient_email} · Approved {new Date(audit.approved_at).toLocaleString()}</p></div>
+          <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${audit.status === "sent" ? "bg-emerald-400/10 text-emerald-300" : audit.status === "failed" ? "bg-rose-400/10 text-rose-300" : "bg-amber-400/10 text-amber-200"}`}>{audit.status === "sent" ? "Sent" : audit.status === "failed" ? "Failed" : "Approved"}</span>
+        </div>)}
+      </div>}
+    </section>}
     <section className="rounded-2xl border border-dashed border-white/[.1] bg-[#101a2a]/70 p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4"><div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-xl bg-slate-700/40 text-slate-400"><Unplug size={20}/></span><div><h2 className="text-sm font-semibold text-white">Outlook / Microsoft 365</h2><p className="mt-1 text-xs text-slate-500">Microsoft mailbox integration</p></div></div><span className="inline-flex items-center gap-1.5 rounded-full bg-slate-700/50 px-3 py-1.5 text-[10px] font-semibold text-slate-300"><Clock3 size={12}/> Coming soon</span></div>
       <p className="mt-4 text-xs text-slate-500">Outlook is reserved in the integration roadmap. No Microsoft permissions or connection are requested.</p>
