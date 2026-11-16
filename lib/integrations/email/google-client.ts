@@ -55,7 +55,7 @@ async function loadConnection(organizationId: string) {
   const db = supabase as any;
   const { data: connection, error } = await db
     .from("email_connections")
-    .select("id,organization_id,encrypted_tokens,status")
+    .select("id,organization_id,provider_email,encrypted_tokens,status")
     .eq("organization_id", organizationId)
     .eq("provider", "google")
     .eq("status", "connected")
@@ -290,6 +290,71 @@ export async function syncGmailMessages(input: {
     saved += rows.length;
   }
 
+  // Link only exact, unique email matches inside this contractor workspace.
+  // Ambiguous matches are deliberately left unlinked for a human to resolve.
+  const { data: workspaceLeads } = await supabase
+    .from("leads")
+    .select("id,email,contractor_organization_id")
+    .eq("contractor_organization_id", input.organizationId)
+    .not("email", "is", null);
+
+  const leadByEmail = new Map<string, Array<{ id: string }>>();
+  for (const lead of workspaceLeads ?? []) {
+    const email = lead.email?.trim().toLowerCase();
+    if (!email) continue;
+    const matches = leadByEmail.get(email) ?? [];
+    matches.push({ id: lead.id });
+    leadByEmail.set(email, matches);
+  }
+
+  const { data: syncedRows } = await (supabase as any)
+    .from("gmail_messages")
+    .select("id,provider_message_id,from_email,to_addresses,subject,received_at,lead_id")
+    .eq("email_connection_id", connection.id)
+    .is("lead_id", null)
+    .order("received_at", { ascending: false })
+    .limit(250);
+
+  let linkedMessages = 0;
+  for (const message of syncedRows ?? []) {
+    const sender = String(message.from_email ?? "").trim().toLowerCase();
+    const recipients = Array.isArray(message.to_addresses)
+      ? message.to_addresses.map((entry: { email?: string } | string) =>
+          (typeof entry === "string" ? entry : entry?.email ?? "").trim().toLowerCase())
+      : [];
+    const senderMatches = leadByEmail.get(sender) ?? [];
+    const recipientMatches = recipients.flatMap((email: string) => leadByEmail.get(email) ?? []);
+    const uniqueCandidates = [...new Map([...senderMatches, ...recipientMatches].map((lead) => [lead.id, lead])).values()];
+    if (uniqueCandidates.length !== 1) continue;
+
+    const lead = uniqueCandidates[0];
+    const { error: linkError } = await (supabase as any)
+      .from("gmail_messages")
+      .update({ lead_id: lead.id })
+      .eq("id", message.id)
+      .is("lead_id", null);
+    if (linkError) continue;
+
+    const eventType = senderMatches.length === 1 ? "email_received" : "email_sent";
+    const { data: existingEvent } = await supabase
+      .from("lead_events")
+      .select("id")
+      .eq("lead_id", lead.id)
+      .eq("event_type", eventType)
+      .contains("payload", { gmail_message_id: message.provider_message_id })
+      .limit(1)
+      .maybeSingle();
+    if (!existingEvent) {
+      const { error: eventError } = await supabase.from("lead_events").insert({
+        contractor_organization_id: input.organizationId,
+        lead_id: lead.id,
+        event_type: eventType,
+        payload: { source: "gmail", gmail_message_id: message.provider_message_id, subject: message.subject ?? "", received_at: message.received_at, mailbox: connection.provider_email },
+      });
+      if (!eventError) linkedMessages += 1;
+    }
+  }
+
   const { error: checkpointError } = await (supabase as any)
     .from("email_connections")
     .update({ last_sync_at: new Date().toISOString() })
@@ -300,6 +365,7 @@ export async function syncGmailMessages(input: {
 
   return {
     syncedMessages: saved,
+    linkedMessages,
     failedThreads,
     threadsProcessed: (list.threads ?? []).length,
     nextPageToken: list.nextPageToken ?? null,
