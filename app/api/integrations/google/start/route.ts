@@ -10,9 +10,9 @@ export async function POST(request: Request) {
   const userId = claims?.claims?.sub;
   if (error || typeof userId !== "string") return NextResponse.redirect(new URL("/login", request.url), 303);
 
-  const required = ["GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_REDIRECT_URI", "EMAIL_TOKEN_ENCRYPTION_KEY"];
+  const required = ["GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "GOOGLE_OAUTH_REDIRECT_URI", "EMAIL_TOKEN_ENCRYPTION_KEY"];
   if (required.some((key) => !process.env[key])) return NextResponse.redirect(new URL("/dashboard/integrations?error=configuration", request.url), 303);
-  const { data: memberships } = await supabase.from("organization_memberships").select("organization_id").eq("user_id", userId).limit(1);
+  const { data: memberships } = await supabase.from("organization_memberships").select("organization_id,role").eq("user_id", userId).in("role", ["agency_owner", "agency_admin", "contractor_owner"]).limit(1);
   if (!memberships?.[0]) return NextResponse.redirect(new URL("/dashboard/integrations?error=no_workspace", request.url), 303);
 
   const state = randomBytes(32).toString("base64url");
