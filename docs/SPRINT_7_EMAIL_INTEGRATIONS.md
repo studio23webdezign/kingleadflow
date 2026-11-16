@@ -16,18 +16,18 @@
 - Server-only Gmail client refreshes expired access tokens and stores refreshed credentials encrypted.
 - Tenant-authorized API route lists Gmail threads without exposing provider tokens: `GET /api/integrations/google/threads?organization_id=<workspace-id>`.
 - Manual sync retrieves a bounded batch of full Gmail threads, normalizes message headers and bodies, and idempotently upserts messages by mailbox + provider message ID.
-- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.\n- A searchable, responsive conversation inbox groups synced messages by Gmail thread, expands message bodies and recipients, and indicates when a message has been linked to a CRM lead. Inbox data is loaded through the signed-in user's tenant-scoped Supabase session.
+- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.\n- A searchable, responsive conversation inbox groups synced messages by Gmail thread, expands message bodies and recipients, and indicates when a message has been linked to a CRM lead. Inbox data is loaded through the signed-in user's tenant-scoped Supabase session.\n- A reply composer requires an explicit recipient confirmation checkbox and an explicit Send action. The server records the authenticated approver, recipient, subject, SHA-256 body hash, approval timestamp, and Gmail delivery outcome in `email_send_audit` before/after sending.\n- Gmail RFC Message-ID headers are stored for newly synced messages; replies use Gmail's thread ID plus `In-Reply-To` / `References` headers when available. Older imported messages without a stored Message-ID are sent as a new email rather than falsely claiming thread continuity.
 - Messages are linked to a CRM lead only when sender/recipient email produces exactly one match inside the same contractor workspace. Ambiguous matches remain unlinked; a database trigger rejects cross-workspace links.
 - Linked messages create `email_received` / `email_sent` events in the lead activity timeline, with message ID, subject, received time, and mailbox metadata. Duplicate event checks prevent routine repeat syncs from adding duplicate timeline entries.
 - Provider registry advertises Gmail configuration readiness and Outlook as `coming_soon`.
 
 ## Not yet implemented / not yet verified
 
-- The migrations `20261116120000_gmail_email_connections.sql`, `20261116150000_gmail_message_sync.sql`, and `20261116170000_link_gmail_messages_to_leads.sql` have been committed but must be applied to the development Supabase database.
+- The migrations `20261116120000_gmail_email_connections.sql`, `20261116150000_gmail_message_sync.sql`, `20261116170000_link_gmail_messages_to_leads.sql`, `20261116190000_gmail_send_audit.sql`, and `20261116200000_gmail_reply_threading.sql` have been committed but must be applied to the development Supabase database.
 - The Google OAuth client must be configured and its redirect URI registered.
 - Incremental Gmail History API synchronization: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
 - Message/thread detail UI and human resolution of ambiguous lead matches.
-- Human-approved outbound send flow, approval audit trail, disconnect/revocation, and calendar.
+- Disconnect/revocation and calendar.
 - Automated OAuth/provider tests, tenant-isolation tests, CI verification, and live end-to-end connection testing.
 
 ## Required server-side environment
