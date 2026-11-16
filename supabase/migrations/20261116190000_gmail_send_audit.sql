@@ -1,9 +1,13 @@
--- Composite key supports an explicit same-workspace mailbox foreign key.\nalter table public.email_connections\n  add constraint email_connections_id_org_unique unique (id, organization_id);\n\n-- Immutable approval context and delivery outcome for human-initiated Gmail sends.
+-- Composite key supports an explicit same-workspace mailbox foreign key.
+alter table public.email_connections
+  add constraint email_connections_id_org_unique unique (id, organization_id);
+
+-- Approval context and delivery outcome for human-initiated Gmail sends.
 create table public.email_send_audit (
   id uuid primary key default gen_random_uuid(),
   approval_request_id uuid not null unique,
   organization_id uuid not null references public.organizations(id) on delete cascade,
-  email_connection_id uuid not null references public.email_connections(id) on delete cascade,
+  email_connection_id uuid not null,
   actor_user_id uuid not null references auth.users(id) on delete restrict,
   recipient_email text not null,
   subject text not null,
@@ -16,7 +20,7 @@ create table public.email_send_audit (
   created_at timestamptz not null default now(),
   constraint email_send_audit_connection_tenant_fk
     foreign key (email_connection_id, organization_id)
-    references public.email_connections(id, organization_id)
+    references public.email_connections(id, organization_id) on delete cascade
 );
 
 create index email_send_audit_org_created_idx
@@ -24,7 +28,8 @@ create index email_send_audit_org_created_idx
 
 alter table public.email_send_audit enable row level security;
 revoke all on public.email_send_audit from anon, authenticated;
-grant select, insert on public.email_send_audit to authenticated;\ngrant update (status, provider_message_id, error_code, sent_at) on public.email_send_audit to authenticated;
+grant select, insert on public.email_send_audit to authenticated;
+grant update (status, provider_message_id, error_code, sent_at) on public.email_send_audit to authenticated;
 
 create policy "workspace admins can view email send audit"
 on public.email_send_audit for select to authenticated
