@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     .select("organization_id,role")
     .eq("user_id", userId)
     .in("role", CONNECT_ROLES)
-    .order("created_at", { ascending: true })
     .limit(1);
   if (membershipError || !memberships?.[0]) {
     return NextResponse.redirect(new URL("/dashboard/integrations?error=no_workspace", request.url), 303);
