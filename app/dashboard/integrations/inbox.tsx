@@ -16,7 +16,7 @@ type Message = {
   lead_id: string | null;
 };
 
-type Draft = { to: string; subject: string; textBody: string; threadId: string; inReplyTo?: string };
+type Draft = { to: string; subject: string; textBody: string; threadId: string; approvalRequestId: string; inReplyTo?: string };
 
 export function GmailInbox({ messages, organizationId, mailboxEmail }: {
   messages: Message[];
@@ -55,7 +55,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
       ? latest.to_addresses.find((address) => address.email?.toLowerCase() !== mailboxEmail.toLowerCase())?.email ?? ""
       : latest.from_email;
     const subject = /^re:/i.test(latest.subject) ? latest.subject : `Re: ${latest.subject}`;
-    setDraft({ to: recipient, subject, textBody: "", threadId, inReplyTo: latest.rfc_message_id ?? undefined });
+    setDraft({ to: recipient, subject, textBody: "", threadId, approvalRequestId: draft.approvalRequestId, inReplyTo: latest.rfc_message_id ?? undefined });
     setConfirmed(false);
     setNotice(null);
   }
