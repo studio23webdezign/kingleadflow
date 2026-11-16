@@ -321,6 +321,7 @@ export async function syncGmailMessages(input: {
         provider_message_id: message.id,
         provider_thread_id: message.threadId || thread.id,
         subject: headerValue(headers, "Subject"),
+        rfc_message_id: headerValue(headers, "Message-ID") || null,
         from_name: from.name,
         from_email: from.email,
         to_addresses: to,
