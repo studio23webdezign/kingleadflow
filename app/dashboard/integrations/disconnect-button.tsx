@@ -21,7 +21,9 @@ export function GmailDisconnectButton({ organizationId }: { organizationId: stri
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Gmail could not be disconnected.");
-      if (!result.providerRevoked) setError(result.message);
+      router.replace(result.providerRevoked
+        ? "/dashboard/integrations?status=disconnected"
+        : "/dashboard/integrations?status=disconnected&error=revocation");
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Gmail could not be disconnected.");
