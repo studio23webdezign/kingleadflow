@@ -1,6 +1,6 @@
 export type EmailProviderId = "google" | "microsoft";
 
-export type EmailProviderStatus = "needs_configuration" | "ready";
+export type EmailProviderStatus = "needs_configuration" | "ready" | "coming_soon";
 
 export interface EmailProviderDescriptor {
   id: EmailProviderId;
