@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, Clock3, Mail, ShieldCheck, Unplug } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GmailSyncButton } from "./sync-button";
+import { GmailDisconnectButton } from "./disconnect-button";
 import { GmailInbox } from "./inbox";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   const organizationIds = (memberships ?? []).map((item) => item.organization_id);
   const db = supabase as any;
   const { data: connections } = organizationIds.length
-    ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status,last_sync_at").in("organization_id", organizationIds).eq("provider","google")
+    ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status,last_sync_at").in("organization_id", organizationIds).eq("provider","google").eq("status","connected")
     : { data: [] };
   const connection = connections?.[0];
   const { data: sendAudits } = connection
@@ -41,7 +42,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
         <div className="flex items-center gap-3"><span className="grid size-12 place-items-center rounded-xl bg-red-500/10 text-red-300"><Mail size={23}/></span><div><h2 className="text-base font-semibold text-white">Gmail / Google Workspace</h2><p className="mt-1 text-xs text-slate-400">Connect a Google mailbox</p></div></div>
         {connection ? <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1.5 text-[11px] font-semibold text-emerald-300"><CheckCircle2 size={13}/> Connected</span> : <span className="rounded-full bg-amber-400/10 px-3 py-1.5 text-[11px] font-semibold text-amber-200">Not connected</span>}
       </div>
-      {connection ? <div className="mt-6 rounded-xl border border-white/[.07] bg-[#0b1220] p-4"><p className="text-sm font-semibold text-white">{connection.provider_email}</p><p className="mt-1 text-[11px] text-slate-500">Connected {new Date(connection.connected_at).toLocaleString()}</p><p className="mt-1 text-[11px] text-slate-500">{connection.last_sync_at ? `Last sync ${new Date(connection.last_sync_at).toLocaleString()}` : "No messages synced yet"}</p><p className="mt-3 text-xs text-slate-400">Sync recent conversations into this workspace. Replies require recipient review, explicit approval, and audit logging. Nothing is sent automatically.</p><GmailSyncButton organizationId={connection.organization_id}/></div> : <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="max-w-xl text-xs leading-6 text-slate-400"><p>Google will ask you to approve mailbox access. AI-generated replies remain drafts and require your approval before sending.</p><p className="mt-2 inline-flex items-center gap-1.5 text-slate-500"><ShieldCheck size={13}/> OAuth tokens are encrypted at rest.</p></div><form action="/api/integrations/google/start" method="post"><button className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-xs font-semibold text-white transition hover:bg-blue-500"><Mail size={15}/> Connect Gmail</button></form></div>}
+      {connection ? <div className="mt-6 rounded-xl border border-white/[.07] bg-[#0b1220] p-4"><p className="text-sm font-semibold text-white">{connection.provider_email}</p><p className="mt-1 text-[11px] text-slate-500">Connected {new Date(connection.connected_at).toLocaleString()}</p><p className="mt-1 text-[11px] text-slate-500">{connection.last_sync_at ? `Last sync ${new Date(connection.last_sync_at).toLocaleString()}` : "No messages synced yet"}</p><p className="mt-3 text-xs text-slate-400">Sync recent conversations into this workspace. Replies require recipient review, explicit approval, and audit logging. Nothing is sent automatically.</p><GmailSyncButton organizationId={connection.organization_id}/><GmailDisconnectButton organizationId={connection.organization_id}/></div> : <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="max-w-xl text-xs leading-6 text-slate-400"><p>Google will ask you to approve mailbox access. AI-generated replies remain drafts and require your approval before sending.</p><p className="mt-2 inline-flex items-center gap-1.5 text-slate-500"><ShieldCheck size={13}/> OAuth tokens are encrypted at rest.</p></div><form action="/api/integrations/google/start" method="post"><button className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-xs font-semibold text-white transition hover:bg-blue-500"><Mail size={15}/> Connect Gmail</button></form></div>}
     </section>
     {connection && <GmailInbox messages={syncedMessages ?? []} organizationId={connection.organization_id} mailboxEmail={connection.provider_email} />}
     {connection && <section className="overflow-hidden rounded-2xl border border-white/[.07] bg-[#111c2e]">
