@@ -469,7 +469,7 @@ export async function sendGoogleMessage(input: {
       authorization: `Bearer ${accessToken}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ raw }),
+    body: JSON.stringify({ raw, ...(input.threadId && input.inReplyTo ? { threadId: input.threadId } : {}) }),
     cache: "no-store",
   });
   if (!response.ok) {
