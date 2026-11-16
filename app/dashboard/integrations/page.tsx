@@ -22,7 +22,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
     : { data: [] };
   const connection = connections?.[0];
   const { data: syncedMessages } = connection
-    ? await db.from("gmail_messages").select("id,provider_thread_id,subject,from_name,from_email,to_addresses,snippet,text_body,received_at,lead_id").eq("email_connection_id", connection.id).order("received_at", { ascending: false }).limit(100)
+    ? await db.from("gmail_messages").select("id,provider_thread_id,subject,rfc_message_id,from_name,from_email,to_addresses,snippet,text_body,received_at,lead_id").eq("email_connection_id", connection.id).order("received_at", { ascending: false }).limit(100)
     : { data: [] };
 
   return <div className="mx-auto max-w-5xl space-y-7">
