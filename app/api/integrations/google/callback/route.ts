@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Gmail tables are introduced by this branch migration and are not yet present in generated Supabase database types. */
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { encryptMailboxTokens } from "@/lib/integrations/email/crypto";
@@ -98,7 +100,6 @@ export async function GET(request: NextRequest) {
     return fail(request, "encryption_configuration");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is introduced by this branch migration and is not yet in generated DB types.
   const db = supabase as any;
   const { error: saveError } = await db.from("email_connections").upsert({
     organization_id: organizationId,
