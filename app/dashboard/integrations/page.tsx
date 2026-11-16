@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Gmail tables are introduced by this branch migration and are not yet present in generated Supabase database types. */
+
 import { redirect } from "next/navigation";
 import { CheckCircle2, Clock3, Mail, ShieldCheck, Unplug } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -13,7 +15,6 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   if (typeof userId !== "string") redirect("/login");
   const { data: memberships } = await supabase.from("organization_memberships").select("organization_id,role").eq("user_id", userId);
   const organizationIds = (memberships ?? []).map((item) => item.organization_id);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is introduced by this branch migration and is not yet in generated DB types.
   const db = supabase as any;
   const { data: connections } = organizationIds.length
     ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status").in("organization_id", organizationIds).eq("provider","google")
