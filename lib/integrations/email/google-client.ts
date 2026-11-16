@@ -442,26 +442,32 @@ export async function sendGoogleMessage(input: {
   to: string;
   subject: string;
   textBody: string;
+  threadId?: string;
+  inReplyTo?: string;
 }) {
   const { connection } = await loadConnection(input.organizationId);
   const accessToken = await getGoogleAccessToken(input.organizationId);
   const safeTo = input.to.trim();
-  const safeSubject = input.subject.replace(/[\\r\\n]+/g, " ").trim();
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(safeTo) || /[\\r\\n]/.test(safeTo)) {
+  const safeSubject = input.subject.replace(/[\r\n]+/g, " ").trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeTo) || /[\r\n]/.test(safeTo)) {
     throw new GmailIntegrationError("Enter one valid recipient email address.", "invalid_response");
   }
   if (!safeSubject || !input.textBody.trim()) {
     throw new GmailIntegrationError("A subject and message are required.", "invalid_response");
   }
+  if ((input.threadId && !input.inReplyTo) || (input.inReplyTo && !input.threadId) || (input.inReplyTo && /[\r\n]/.test(input.inReplyTo))) {
+    throw new GmailIntegrationError("The reply thread reference is invalid.", "invalid_response");
+  }
   const mime = [
     `To: ${safeTo}`,
     `Subject: =?UTF-8?B?${Buffer.from(safeSubject, "utf8").toString("base64")}?=`,
+    ...(input.inReplyTo ? [`In-Reply-To: ${input.inReplyTo}`, `References: ${input.inReplyTo}`] : []),
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: 8bit",
     "",
-    input.textBody.replace(/\\r?\\n/g, "\\r\\n"),
-  ].join("\\r\\n");
+    input.textBody.replace(/\r?\n/g, "\r\n"),
+  ].join("\r\n");
   const raw = Buffer.from(mime, "utf8").toString("base64url");
   const response = await fetch(`${GMAIL_API}/messages/send`, {
     method: "POST",
