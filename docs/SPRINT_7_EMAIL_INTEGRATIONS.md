@@ -15,11 +15,13 @@
 - RLS limits mailbox connection row access to workspace owners/admins; ordinary members cannot read encrypted credential records.
 - Server-only Gmail client refreshes expired access tokens and stores refreshed credentials encrypted.
 - Tenant-authorized API route lists Gmail threads without exposing provider tokens: `GET /api/integrations/google/threads?organization_id=<workspace-id>`.
+- Manual sync retrieves a bounded batch of full Gmail threads, normalizes message headers and bodies, and idempotently upserts messages by mailbox + provider message ID.
+- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.
 - Provider registry advertises Gmail configuration readiness and Outlook as `coming_soon`.
 
 ## Not yet implemented / not yet verified
 
-- The migration `20261116120000_gmail_email_connections.sql` has been committed but must be applied to the development Supabase database.
+- The migrations `20261116120000_gmail_email_connections.sql` and `20261116150000_gmail_message_sync.sql` have been committed but must be applied to the development Supabase database.
 - The Google OAuth client must be configured and its redirect URI registered.
 - Persistent inbox synchronization, message/thread detail retrieval, idempotent sync checkpoints, and lead timeline linking.
 - Human-approved outbound send flow, approval audit trail, disconnect/revocation, and calendar.
