@@ -13,7 +13,8 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   if (typeof userId !== "string") redirect("/login");
   const { data: memberships } = await supabase.from("organization_memberships").select("organization_id,role").eq("user_id", userId);
   const organizationIds = (memberships ?? []).map((item) => item.organization_id);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is introduced by this branch migration and is not yet in generated DB types.\n  const db = supabase as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is introduced by this branch migration and is not yet in generated DB types.
+  const db = supabase as any;
   const { data: connections } = organizationIds.length
     ? await db.from("email_connections").select("id,organization_id,provider_email,connected_at,status").in("organization_id", organizationIds).eq("provider","google")
     : { data: [] };
