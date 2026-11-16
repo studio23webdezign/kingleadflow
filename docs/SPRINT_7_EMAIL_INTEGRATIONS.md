@@ -16,7 +16,7 @@
 - Server-only Gmail client refreshes expired access tokens and stores refreshed credentials encrypted.
 - Tenant-authorized API route lists Gmail threads without exposing provider tokens: `GET /api/integrations/google/threads?organization_id=<workspace-id>`.
 - Manual sync retrieves a bounded batch of full Gmail threads, normalizes message headers and bodies, and idempotently upserts messages by mailbox + provider message ID.
-- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.
+- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.\n- A searchable, responsive conversation inbox groups synced messages by Gmail thread, expands message bodies and recipients, and indicates when a message has been linked to a CRM lead. Inbox data is loaded through the signed-in user's tenant-scoped Supabase session.
 - Messages are linked to a CRM lead only when sender/recipient email produces exactly one match inside the same contractor workspace. Ambiguous matches remain unlinked; a database trigger rejects cross-workspace links.
 - Linked messages create `email_received` / `email_sent` events in the lead activity timeline, with message ID, subject, received time, and mailbox metadata. Duplicate event checks prevent routine repeat syncs from adding duplicate timeline entries.
 - Provider registry advertises Gmail configuration readiness and Outlook as `coming_soon`.
