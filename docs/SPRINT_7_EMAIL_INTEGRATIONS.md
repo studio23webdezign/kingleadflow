@@ -23,13 +23,13 @@
 
 ## Not yet implemented / not yet verified
 
-- The migrations `20261116120000_gmail_email_connections.sql`, `20261116150000_gmail_message_sync.sql`, `20261116170000_link_gmail_messages_to_leads.sql`, `20261116190000_gmail_send_audit.sql`, and `20261116200000_gmail_reply_threading.sql` have been committed but must be applied to the development Supabase database.
+- The five feature migrations plus tenant-integrity/index migrations `20261116194500_gmail_tenant_integrity_indexes.sql` and `20261116195000_gmail_message_tenant_fk_index.sql` are applied to the `king-leadflow-ai` Supabase project. All three email tables have RLS enabled. The database contains no imported Gmail messages yet.
 - The Google OAuth client must be configured and its redirect URI registered.
-- Incremental Gmail History API synchronization: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
+- Incremental Gmail History API synchronization is implemented: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
 - Message/thread detail UI and human resolution of ambiguous lead matches.
 - Gmail disconnect is implemented: workspace-admin authorization is rechecked, local mailbox access and the history cursor are disabled/cleared before best-effort Google token revocation; synced CRM messages and send audit records are retained. If provider revocation is unavailable, the UI directs the user to remove the app from Google Account third-party access settings.
 - Calendar.
-- Automated OAuth/provider tests, tenant-isolation tests, CI verification, and live end-to-end connection testing.
+- Automated credential-encryption unit tests have been added. CI verification for the latest changes and live OAuth/provider, tenant-isolation, mailbox connection, synchronization, sending, and disconnect end-to-end testing remain outstanding.
 
 ## Required server-side environment
 
