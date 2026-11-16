@@ -24,7 +24,7 @@ create index email_send_audit_org_created_idx
 
 alter table public.email_send_audit enable row level security;
 revoke all on public.email_send_audit from anon, authenticated;
-grant select, insert, update on public.email_send_audit to authenticated;
+grant select, insert on public.email_send_audit to authenticated;\ngrant update (status, provider_message_id, error_code, sent_at) on public.email_send_audit to authenticated;
 
 create policy "workspace admins can view email send audit"
 on public.email_send_audit for select to authenticated
