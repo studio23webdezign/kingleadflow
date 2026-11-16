@@ -268,6 +268,18 @@ export async function syncGmailMessages(input: {
 
   if (!connection.last_sync_history_id || input.query || historyExpired) {
     syncMode = input.query ? "search" : "initial";
+    // Capture the baseline before listing threads so arrivals during import
+    // are picked up by the next History API pass.
+    const profileResponse = await fetch(`${GMAIL_API}/profile`, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (profileResponse.ok) {
+      const profile = await profileResponse.json() as GmailProfile;
+      candidateHistoryId = profile.historyId ?? null;
+    } else if (profileResponse.status === 401 || profileResponse.status === 403) {
+      throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
+    }
     const params = new URLSearchParams({ maxResults: String(maxThreads) });
     if (input.query) params.set("q", input.query);
     const response = await fetch(`${GMAIL_API}/threads?${params.toString()}`, {
@@ -396,20 +408,8 @@ export async function syncGmailMessages(input: {
     }
   }
 
-  // Establish a baseline cursor after the initial/search import, or use the
-  // newest cursor returned by the fully paginated History API response.
-  if (!candidateHistoryId && syncMode !== "incremental") {
-    const profileResponse = await fetch(`${GMAIL_API}/profile`, {
-      headers: { authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    });
-    if (profileResponse.ok) {
-      const profile = await profileResponse.json() as GmailProfile;
-      candidateHistoryId = profile.historyId ?? null;
-    } else if (profileResponse.status === 401 || profileResponse.status === 403) {
-      throw new GmailIntegrationError("Gmail access needs to be renewed.", "reauthorization_required");
-    }
-  }
+  // Incremental sync uses the latest historyId from the final history page.
+
 
   const checkpointUpdate: Record<string, unknown> = { last_sync_at: new Date().toISOString() };
   // Never advance the history cursor if any thread failed; the next run will retry it.
