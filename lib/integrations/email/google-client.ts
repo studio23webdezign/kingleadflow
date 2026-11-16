@@ -50,7 +50,8 @@ async function loadConnection(organizationId: string) {
     throw new GmailIntegrationError("You do not have permission to access this mailbox.", "not_connected");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email tables are introduced by this branch migration and are not yet in generated DB types.\n  const db = supabase as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email tables are introduced by this branch migration and are not yet in generated DB types.
+  const db = supabase as any;
   const { data: connection, error } = await db
     .from("email_connections")
     .select("id,organization_id,encrypted_tokens,status")
@@ -78,7 +79,9 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
 
   if (tokens.expires_at > Date.now() + 60_000) return tokens.access_token;
   if (!tokens.refresh_token) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.\n    await (supabase as any).from("email_connections")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
+    await (supabase as any).from("email_connections")
       .update({ status: "reauthorization_required" })
       .eq("id", connection.id);
     throw new GmailIntegrationError("Reconnect Gmail to continue.", "reauthorization_required");
@@ -119,7 +122,8 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
     expires_at: Date.now() + (refreshed.expires_in ?? 3600) * 1000,
     scope: refreshed.scope ?? tokens.scope,
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.\n  const { error: updateError } = await (supabase as any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
+  const { error: updateError } = await (supabase as any)
     .from("email_connections")
     .update({ encrypted_tokens: encryptMailboxTokens(updatedTokens) })
     .eq("id", connection.id);
@@ -275,7 +279,8 @@ export async function syncGmailMessages(input: {
       };
     });
     if (!rows.length) continue;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- gmail_messages is introduced by this branch migration.\n    const { error } = await (supabase as any).from("gmail_messages").upsert(rows, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- gmail_messages is introduced by this branch migration.
+    const { error } = await (supabase as any).from("gmail_messages").upsert(rows, {
       onConflict: "email_connection_id,provider_message_id",
     });
     if (error) {
@@ -285,7 +290,8 @@ export async function syncGmailMessages(input: {
     saved += rows.length;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.\n  const { error: checkpointError } = await (supabase as any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
+  const { error: checkpointError } = await (supabase as any)
     .from("email_connections")
     .update({ last_sync_at: new Date().toISOString() })
     .eq("id", connection.id);
