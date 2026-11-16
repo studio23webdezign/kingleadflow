@@ -1,4 +1,4 @@
--- Immutable approval context and delivery outcome for human-initiated Gmail sends.
+-- Composite key supports an explicit same-workspace mailbox foreign key.\nalter table public.email_connections\n  add constraint email_connections_id_org_unique unique (id, organization_id);\n\n-- Immutable approval context and delivery outcome for human-initiated Gmail sends.
 create table public.email_send_audit (
   id uuid primary key default gen_random_uuid(),
   approval_request_id uuid not null unique,
