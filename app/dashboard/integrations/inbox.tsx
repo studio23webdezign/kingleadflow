@@ -56,7 +56,7 @@ export function GmailInbox({ messages, organizationId, mailboxEmail }: {
       ? latest.to_addresses.find((address) => address.email?.toLowerCase() !== mailboxEmail.toLowerCase())?.email ?? ""
       : latest.from_email;
     const subject = /^re:/i.test(latest.subject) ? latest.subject : `Re: ${latest.subject}`;
-    setDraft({ to: recipient, subject, textBody: "", threadId, approvalRequestId: draft.approvalRequestId, inReplyTo: latest.rfc_message_id ?? undefined });
+    setDraft({ to: recipient, subject, textBody: "", threadId, approvalRequestId: crypto.randomUUID(), inReplyTo: latest.rfc_message_id ?? undefined });
     setConfirmed(false);
     setNotice(null);
   }
