@@ -42,3 +42,16 @@ button,a{-webkit-tap-highlight-color:transparent}
 .app-field option{background:#0d1930;color:#f1f6ff}
 .app-field:disabled{color:#94a3b8;background:#111c30}
 @media(max-width:480px){.app-page-copy{font-size:12px;line-height:1.75}.app-surface{min-width:0}}
+
+/* Premium artwork-inspired dashboard system */
+.kl-panel{min-width:0;border:1px solid rgba(116,166,255,.17);border-radius:21px;background:linear-gradient(145deg,rgba(20,34,64,.97),rgba(10,20,42,.98));box-shadow:0 16px 42px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)}
+.kl-eyebrow{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#7dbaff}
+.kl-text-link{display:inline-flex;align-items:center;gap:5px;color:#80baff;font-size:10px;font-weight:700;white-space:nowrap}
+.kl-funnel-stage{height:17px;border:1px solid rgba(255,255,255,.22);border-radius:5px 5px 9px 9px;box-shadow:0 5px 15px rgba(0,0,0,.18);opacity:.9;clip-path:polygon(0 0,100% 0,82% 100%,18% 100%)}
+.kl-score-ring{--score:0%;display:grid;width:92px;height:92px;flex:none;place-items:center;border-radius:50%;background:conic-gradient(#20d5ff var(--score),#7c3aed var(--score),rgba(119,146,190,.16) 0);position:relative}
+.kl-score-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#101d39}
+.kl-score-ring span{position:relative;color:#fff;font-size:20px;font-weight:800}
+.kl-action-button{display:flex;min-height:40px;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(120,180,255,.22);border-radius:12px;background:linear-gradient(100deg,rgba(18,101,245,.22),rgba(107,57,219,.2));color:#dceaff;font-size:11px;font-weight:700;transition:background .2s,border-color .2s}
+.kl-action-button:hover{border-color:rgba(120,180,255,.5);background:rgba(37,99,235,.25)}
+.kl-integration-card{min-width:0;border:1px solid rgba(137,174,230,.14);border-radius:16px;background:linear-gradient(145deg,rgba(24,40,72,.9),rgba(12,25,48,.9));padding:13px}
+@media(max-width:480px){.kl-panel{border-radius:17px;padding:15px}.kl-integration-card{padding:11px}}
