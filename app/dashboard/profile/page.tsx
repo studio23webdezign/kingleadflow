@@ -48,7 +48,7 @@ export default async function ContractorProfilePage() {
             </form>
           );
         })}
-        {(!orgs || orgs.length === 0) && <div className="rounded-2xl border border-dashed border-white/10 bg-[#111c2e] px-6 py-12 text-center"><BriefcaseBusiness size={22} className="mx-auto text-slate-500" /><p className="mt-3 text-xs font-semibold text-slate-200">No contractor-owner workspace found</p><p className="mt-1 text-[11px] text-slate-500">A contractor owner can configure a business profile here.</p></div>}
+        {(!orgs || orgs.length === 0) && <div className="app-surface flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-500/15 text-blue-300"><BriefcaseBusiness size={19} /></span><div><p className="text-sm font-semibold text-slate-100">No contractor business is connected yet</p><p className="mt-1 max-w-xl text-xs leading-6 text-slate-400">Business profiles belong to contractor workspaces. Your agency workspace can manage contractor businesses from Clients. Once a contractor client is connected, their profile can be configured here by an authorised contractor owner.</p></div></div><a href="/dashboard/clients" className="app-primary shrink-0 px-4 py-2.5 text-xs">Open client directory <span aria-hidden="true">→</span></a></div>}
       </div>
     </div>
   );
