@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
     return fail(request, "encryption_configuration");
   }
 
-  const admin = createAdminClient();
+  const admin = createAdminClient() as any;
   const { error: saveError } = await admin.from("email_connections").upsert({
     organization_id: organizationId,
     connected_by: userId,
