@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { decryptMailboxTokens } from "@/lib/integrations/email/crypto";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   // Gmail tables are introduced by this branch migration and are not yet in generated Supabase types.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = createAdminClient();
   const { data: connection, error: connectionError } = await db
     .from("email_connections")
     .select("id,encrypted_tokens")
