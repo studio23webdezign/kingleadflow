@@ -4,6 +4,7 @@ import "server-only";
 
 import { decryptMailboxTokens, encryptMailboxTokens } from "@/lib/integrations/email/crypto";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const ADMIN_ROLES = ["agency_owner", "agency_admin", "contractor_owner"];
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -58,8 +59,8 @@ async function loadConnection(organizationId: string) {
     throw new GmailIntegrationError("You do not have permission to access this mailbox.", "not_connected");
   }
 
-  const db = supabase as any;
-  const { data: connection, error } = await db
+  const admin = createAdminClient();
+  const { data: connection, error } = await admin
     .from("email_connections")
     .select("id,organization_id,provider_email,encrypted_tokens,status,last_sync_history_id")
     .eq("organization_id", organizationId)
@@ -71,12 +72,12 @@ async function loadConnection(organizationId: string) {
   if (error || !connection) {
     throw new GmailIntegrationError("No Gmail mailbox is connected to this workspace.", "not_connected");
   }
-  return { supabase, connection, userId };
+  return { supabase, admin, connection, userId };
 }
 
 /** Refreshes credentials server-side; encrypted tokens never leave this module. */
 export async function getGoogleAccessToken(organizationId: string): Promise<string> {
-  const { supabase, connection } = await loadConnection(organizationId);
+  const { admin, connection } = await loadConnection(organizationId);
   let tokens: StoredTokens;
   try {
     tokens = decryptMailboxTokens(connection.encrypted_tokens);
@@ -88,7 +89,7 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
   if (!tokens.refresh_token) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- email_connections is not yet in generated DB types.
-    await (supabase as any).from("email_connections")
+    await admin.from("email_connections")
       .update({ status: "reauthorization_required" })
       .eq("id", connection.id);
     throw new GmailIntegrationError("Reconnect Gmail to continue.", "reauthorization_required");
@@ -129,7 +130,7 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
     expires_at: Date.now() + (refreshed.expires_in ?? 3600) * 1000,
     scope: refreshed.scope ?? tokens.scope,
   };
-  const { error: updateError } = await (supabase as any)
+  const { error: updateError } = await admin
     .from("email_connections")
     .update({ encrypted_tokens: encryptMailboxTokens(updatedTokens) })
     .eq("id", connection.id);
