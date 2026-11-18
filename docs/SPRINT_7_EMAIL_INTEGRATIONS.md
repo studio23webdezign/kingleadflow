@@ -1,0 +1,56 @@
+# Sprint 7 — Gmail integration (Outlook placeholder)
+
+## Scope
+
+1. Gmail / Google Workspace is the only active email provider.
+2. Outlook / Microsoft 365 remains a non-functional **Coming soon** placeholder. Do not request Microsoft credentials or add Microsoft permissions.
+3. Customer email must never be sent without an explicit human approval action.
+
+## Implemented on `sprint-7-email-foundation`
+
+- Dashboard route: `/dashboard/integrations`; Gmail connection status and Outlook placeholder.
+- Google OAuth authorization-code flow with PKCE, random state, short-lived HttpOnly cookies, and a workspace membership check.
+- Callback re-checks the user's workspace role before exchanging the code and persisting credentials.
+- Access and refresh tokens are encrypted with AES-256-GCM before storage in `email_connections`.
+- RLS limits mailbox metadata and message access to workspace owners/admins. Encrypted OAuth credentials are not selectable by authenticated PostgREST clients at all; a server-only Supabase secret client handles token reads/writes after the caller's workspace role is checked.
+- Server-only Gmail client refreshes expired access tokens and stores refreshed credentials encrypted.
+- Tenant-authorized API route lists Gmail threads without exposing provider tokens: `GET /api/integrations/google/threads?organization_id=<workspace-id>`.
+- Manual sync retrieves a bounded batch of full Gmail threads, normalizes message headers and bodies, and idempotently upserts messages by mailbox + provider message ID.
+- A manual **Sync recent messages** control is available on the integrations page; the sync endpoint re-checks workspace role before reading or writing mailbox data.\n- A searchable, responsive conversation inbox groups synced messages by Gmail thread, expands message bodies and recipients, and indicates when a message has been linked to a CRM lead. Inbox data is loaded through the signed-in user's tenant-scoped Supabase session.\n- A reply composer requires an explicit recipient confirmation checkbox and an explicit Send action. The server records the authenticated approver, recipient, subject, SHA-256 body hash, approval timestamp, and Gmail delivery outcome in `email_send_audit` before/after sending.\n- Gmail RFC Message-ID headers are stored for newly synced messages; replies use Gmail's thread ID plus `In-Reply-To` / `References` headers when available. Older imported messages without a stored Message-ID are sent as a new email rather than falsely claiming thread continuity.
+- Messages are linked to a CRM lead only when sender/recipient email produces exactly one match inside the same contractor workspace. Ambiguous matches remain unlinked; a database trigger rejects cross-workspace links.
+- Linked messages create `email_received` / `email_sent` events in the lead activity timeline, with message ID, subject, received time, and mailbox metadata. Duplicate event checks prevent routine repeat syncs from adding duplicate timeline entries.
+- Provider registry advertises Gmail configuration readiness and Outlook as `coming_soon`.
+
+## Not yet implemented / not yet verified
+
+- The five feature migrations plus tenant-integrity/index migrations `20261116194500_gmail_tenant_integrity_indexes.sql` and `20261116195000_gmail_message_tenant_fk_index.sql` are applied to the `king-leadflow-ai` Supabase project. All three email tables have RLS enabled. The database contains no imported Gmail messages yet.
+- The Google OAuth client must be configured and its redirect URI registered.
+- Incremental Gmail History API synchronization is implemented: first sync captures a mailbox `historyId` baseline before importing a bounded recent-thread batch; later syncs page through `history.list` and fetch only threads containing newly added messages. The cursor advances only after all fetched threads succeed; expired cursors trigger a bounded recent-thread recovery import. Search-filtered manual syncs remain separate from incremental history sync.
+- Message/thread detail UI and human resolution of ambiguous lead matches.
+- Gmail disconnect is implemented: workspace-admin authorization is rechecked, local mailbox access and the history cursor are disabled/cleared before best-effort Google token revocation; synced CRM messages and send audit records are retained. If provider revocation is unavailable, the UI directs the user to remove the app from Google Account third-party access settings.
+- Calendar.
+- Automated credential-encryption unit tests have been added. CI verification for the latest changes and live OAuth/provider, tenant-isolation, mailbox connection, synchronization, sending, and disconnect end-to-end testing remain outstanding.
+
+## Required server-side environment
+
+Gmail:
+- `GOOGLE_OAUTH_CLIENT_ID`
+- `GOOGLE_OAUTH_CLIENT_SECRET`
+- `GOOGLE_OAUTH_REDIRECT_URI`
+
+Shared:
+- `EMAIL_TOKEN_ENCRYPTION_KEY` — 32 random bytes encoded as 64 hexadecimal characters. Keep it separate from Supabase keys and JWT secrets.
+
+Set these only as private Render environment variables, never as `NEXT_PUBLIC_*`. Register the exact callback URL `https://YOUR_DOMAIN/api/integrations/google/callback` in the Google OAuth client.
+
+## Security requirements
+
+- Keep all OAuth secrets and tokens server-side. Never log token responses or return encrypted token blobs to the browser. Authenticated users receive column-level SELECT access only to non-secret mailbox metadata; OAuth credential columns are inaccessible through PostgREST.
+- Verify state and PKCE on callback; re-check the signed-in user and their current workspace role before storing credentials.
+- Encrypt tokens at rest with authenticated encryption. Back up the encryption key securely; rotating it requires a controlled re-encryption procedure.
+- Restrict access to mailbox credentials to workspace owners/admins and enforce organization membership for every mailbox operation.
+- Handle refresh-token expiry/revocation, provider throttling, and missing consent gracefully.
+- Deduplicate synced messages by provider + mailbox + provider message ID and persist history cursors.
+- Record approver, approved content hash, recipient, timestamp, and provider result for every outbound send.
+- Do not send AI-generated drafts automatically.
+- Disconnect must revoke provider consent where supported and delete stored credentials and sync cursors.

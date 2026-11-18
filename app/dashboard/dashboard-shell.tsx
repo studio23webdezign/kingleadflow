@@ -9,6 +9,7 @@ import {
   Building2,
   Crown,
   LayoutDashboard,
+  Mail,
   Menu,
   Sparkles,
   UsersRound,
@@ -29,6 +30,7 @@ const navigation = [
       { href: "/dashboard/ai", label: "AI receptionist", icon: Sparkles, accent: true },
       { href: "/dashboard/clients", label: "Client workspaces", icon: Building2 },
       { href: "/dashboard/profile", label: "Business profiles", icon: BriefcaseBusiness },
+      { href: "/dashboard/integrations", label: "Email integrations", icon: Mail },
     ],
   },
 ];
