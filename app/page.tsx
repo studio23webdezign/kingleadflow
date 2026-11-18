@@ -37,7 +37,7 @@ export default function Home() {
 
         <div className="relative">
           <div className="absolute -inset-8 rounded-[36px] bg-blue-500/[.08] blur-3xl" />
-          <div className="app-surface relative overflow-hidden p-5 shadow-2xl shadow-black/30 sm:p-6"><div className="pointer-events-none absolute -right-4 -top-10 h-44 w-64 opacity-90 sm:h-52 sm:w-80"><HeroRobot /></div><div className="relative z-10">
+          <div className="app-surface relative overflow-hidden p-5 shadow-2xl shadow-black/30 sm:p-6"><div className="relative z-10">
             <div className="flex items-center justify-between border-b border-white/[.07] pb-4">
               <div><p className="text-[9px] font-bold tracking-[.16em] text-slate-500">WORKSPACE PREVIEW</p><h2 className="mt-1 text-sm font-semibold text-white">Agency command centre</h2></div>
               <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[.06] px-2.5 py-1 text-[9px] font-semibold text-emerald-300">Live workspace view</span>
@@ -51,7 +51,7 @@ export default function Home() {
                 {["Capture enquiry", "AI qualification", "Human-reviewed follow-up"].map((item, index) => <div key={item} className="flex items-center gap-3"><span className="grid size-6 place-items-center rounded-lg bg-blue-500/15 text-[9px] font-bold text-blue-200">0{index + 1}</span><span className="text-[10px] text-slate-300">{item}</span><CheckCircle2 size={13} className="ml-auto text-blue-300/70" /></div>)}
               </div>
             </div>
-            <p className="mt-4 text-[9px] leading-5 text-slate-500">Illustrative preview only. Workspace figures populate after account setup and data connection.</p></div>
+            <p className="mt-4 text-[9px] leading-5 text-slate-500">Illustrative preview only. Workspace figures populate after account setup and data connection.</p><div className="mt-3 flex h-28 items-end justify-end overflow-hidden border-t border-white/[.05] pt-2 sm:h-32"><div className="h-32 w-48 max-w-[65%] opacity-90 sm:h-36 sm:w-56"><HeroRobot /></div></div></div>
           </div>
         </div>
       </section>
