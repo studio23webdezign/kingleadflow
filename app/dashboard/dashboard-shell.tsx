@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { ArrowUpRight, BarChart3, Bot, BriefcaseBusiness, Building2, CalendarDays, ChevronDown, Crown, Gauge, Headset, LayoutDashboard, Mail, Menu, Search, Settings, Sparkles, UsersRound, Workflow, X, Zap, Funnel } from "lucide-react";
+import { ArrowUpRight, BarChart3, Building2, CalendarDays, ChevronDown, Crown, Headset, LayoutDashboard, Menu, Search, Settings, Sparkles, UsersRound, Workflow, X, Zap, Funnel } from "lucide-react";
 import { RocketIllustration } from "./dashboard-illustrations";
 
 const navigation = [
