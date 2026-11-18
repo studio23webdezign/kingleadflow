@@ -70,11 +70,11 @@ export async function extractContractorInquiry(input: {
       model,
       input: prompt,
       store: false,
-      response_format: [{
+      response_format: {
         type: "text",
         mime_type: "application/json",
         schema: responseSchema,
-      }],
+      },
     }),
     cache: "no-store",
     signal: AbortSignal.timeout(30_000),
