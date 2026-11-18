@@ -37,3 +37,8 @@ button,a{-webkit-tap-highlight-color:transparent}
 .app-auth-field:focus{border-color:#398cff;box-shadow:0 0 0 3px rgba(37,99,235,.14)}
 .app-auth-submit{width:100%;border-radius:12px;background:linear-gradient(100deg,#1265f5,#593be2);padding:13px 18px;font-weight:700;color:white;box-shadow:0 10px 28px rgba(27,85,224,.2)}
 @media(max-width:640px){.app-surface{border-radius:17px}.app-page-title{font-size:26px}.app-auth-panel{border-radius:21px}}
+
+/* Native select menus should remain legible on dark mobile browsers. */
+.app-field option{background:#0d1930;color:#f1f6ff}
+.app-field:disabled{color:#94a3b8;background:#111c30}
+@media(max-width:480px){.app-page-copy{font-size:12px;line-height:1.75}.app-surface{min-width:0}}
