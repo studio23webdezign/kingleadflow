@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     "GOOGLE_OAUTH_CLIENT_SECRET",
     "GOOGLE_OAUTH_REDIRECT_URI",
     "EMAIL_TOKEN_ENCRYPTION_KEY",
+    "SUPABASE_SECRET_KEY",
   ];
   if (required.some((key) => !process.env[key]?.trim())) {
     return NextResponse.redirect(new URL("/dashboard/integrations?error=configuration", request.url), 303);
