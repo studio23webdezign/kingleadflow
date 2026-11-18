@@ -24,8 +24,9 @@ function statusStyle(status: string) {
   return "border-amber-400/20 bg-amber-400/10 text-amber-200";
 }
 
-export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ created?: string; updated?: string; error?: string }> }) {
+export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ created?: string; updated?: string; error?: string; q?: string }> }) {
   const params = await searchParams;
+  const query = (params.q ?? "").replace(/[^\\p{L}\\p{N}\\s@.+_-]/gu, "").trim().slice(0, 80);
   const supabase = await createClient();
   const { data: claims, error: authError } = await supabase.auth.getClaims();
   const userId = claims?.claims?.sub;
@@ -47,9 +48,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
     }
   }
   const workspaces = [...contractorOrgs, ...linkedOrgs].filter((o, i, all) => all.findIndex((x) => x.id === o.id) === i);
-  const { data: leads, error: leadsError } = await supabase.from("leads")
+  let leadsQuery = supabase.from("leads")
     .select("id,contractor_organization_id,contact_name,email,phone,service_requested,source,status,priority,score,created_at")
-    .order("created_at", { ascending: false }).limit(100);
+    .order("created_at", { ascending: false });
+  if (query) leadsQuery = leadsQuery.or(`contact_name.ilike.%${query}%,email.ilike.%${query}%,service_requested.ilike.%${query}%`);
+  const { data: leads, error: leadsError } = await leadsQuery.limit(100);
   const orgNames = new Map(workspaces.map((o) => [o.id, o.name]));
   const rows = leads ?? [];
   const qualified = rows.filter((lead) => ["qualified", "appointment_requested", "appointment_booked", "proposal_sent", "won"].includes(lead.status)).length;
@@ -124,14 +127,14 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
 
         <section className="overflow-hidden app-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[.07] px-5 py-4">
-            <div><h2 className="text-sm font-semibold text-white">All leads</h2><p className="mt-1 text-[10px] text-slate-500">Latest 100 records visible to your account</p></div>
+            <div><h2 className="text-sm font-semibold text-white">{query ? "Search results" : "All leads"}</h2><p className="mt-1 text-[10px] text-slate-500">{query ? `Matches for “${query}” · latest 100 accessible records` : "Latest 100 records visible to your account"}</p></div>
             <span className="rounded-lg border border-white/10 bg-white/[.03] px-2.5 py-1.5 text-[10px] font-medium text-slate-400">{rows.length} records</span>
           </div>
           {leadsError ? <p className="p-6 text-xs text-rose-300">Unable to load leads. Verify the Supabase Data API configuration.</p> : !rows.length ? (
             <div className="px-6 py-14 text-center">
               <span className="mx-auto grid size-11 place-items-center rounded-xl bg-white/[.04] text-slate-400"><UsersRound size={20} /></span>
-              <p className="mt-3 text-xs font-semibold text-slate-200">No leads yet</p>
-              <p className="mt-1 text-[11px] text-slate-500">Add your first lead to start building the pipeline.</p>
+              <p className="mt-3 text-xs font-semibold text-slate-200">{query ? "No matching leads" : "No leads yet"}</p>
+              <p className="mt-1 text-[11px] text-slate-500">{query ? "Try a different name, email or service." : "Add your first lead to start building the pipeline."}</p>
             </div>
           ) : (
             <div className="divide-y divide-white/[.06]">
