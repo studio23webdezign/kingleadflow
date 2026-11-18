@@ -59,7 +59,7 @@ async function loadConnection(organizationId: string) {
     throw new GmailIntegrationError("You do not have permission to access this mailbox.", "not_connected");
   }
 
-  const admin = createAdminClient();
+  const admin = createAdminClient() as any;
   const { data: connection, error } = await admin
     .from("email_connections")
     .select("id,organization_id,provider_email,encrypted_tokens,status,last_sync_history_id")
@@ -108,7 +108,7 @@ export async function getGoogleAccessToken(organizationId: string): Promise<stri
   });
 
   if (!response.ok) {
-    await (supabase as any).from("email_connections")
+    await admin.from("email_connections")
       .update({ status: "reauthorization_required" })
       .eq("id", connection.id);
     throw new GmailIntegrationError("Google rejected the refresh token. Reconnect Gmail.", "reauthorization_required");
