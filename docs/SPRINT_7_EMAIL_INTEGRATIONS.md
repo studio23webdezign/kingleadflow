@@ -12,7 +12,7 @@
 - Google OAuth authorization-code flow with PKCE, random state, short-lived HttpOnly cookies, and a workspace membership check.
 - Callback re-checks the user's workspace role before exchanging the code and persisting credentials.
 - Access and refresh tokens are encrypted with AES-256-GCM before storage in `email_connections`.
-- RLS limits mailbox connection row access to workspace owners/admins; ordinary members cannot read encrypted credential records.
+- RLS limits mailbox metadata and message access to workspace owners/admins. Encrypted OAuth credentials are not selectable by authenticated PostgREST clients at all; a server-only Supabase secret client handles token reads/writes after the caller's workspace role is checked.
 - Server-only Gmail client refreshes expired access tokens and stores refreshed credentials encrypted.
 - Tenant-authorized API route lists Gmail threads without exposing provider tokens: `GET /api/integrations/google/threads?organization_id=<workspace-id>`.
 - Manual sync retrieves a bounded batch of full Gmail threads, normalizes message headers and bodies, and idempotently upserts messages by mailbox + provider message ID.
@@ -45,7 +45,7 @@ Set these only as private Render environment variables, never as `NEXT_PUBLIC_*`
 
 ## Security requirements
 
-- Keep all OAuth secrets and tokens server-side. Never log token responses or return encrypted token blobs to the browser.
+- Keep all OAuth secrets and tokens server-side. Never log token responses or return encrypted token blobs to the browser. Authenticated users receive column-level SELECT access only to non-secret mailbox metadata; OAuth credential columns are inaccessible through PostgREST.
 - Verify state and PKCE on callback; re-check the signed-in user and their current workspace role before storing credentials.
 - Encrypt tokens at rest with authenticated encryption. Back up the encryption key securely; rotating it requires a controlled re-encryption procedure.
 - Restrict access to mailbox credentials to workspace owners/admins and enforce organization membership for every mailbox operation.
