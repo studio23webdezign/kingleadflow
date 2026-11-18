@@ -26,7 +26,7 @@ function statusStyle(status: string) {
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ created?: string; updated?: string; error?: string; q?: string }> }) {
   const params = await searchParams;
-  const query = (params.q ?? "").replace(/[^a-zA-Z0-9\\s@.+_-]/g, "").trim().slice(0, 80);
+  const query = (params.q ?? "").replace(/[^a-zA-Z0-9 @.+_-]/g, "").trim().slice(0, 80);
   const supabase = await createClient();
   const { data: claims, error: authError } = await supabase.auth.getClaims();
   const userId = claims?.claims?.sub;
