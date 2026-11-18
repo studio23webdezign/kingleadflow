@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { BrainCircuit, CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { qualifyInquiry } from "./actions";
+import { HeroRobot } from "../dashboard-illustrations";
 
 export const dynamic = "force-dynamic";
 
@@ -26,26 +27,26 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
   return (
     <div className="space-y-7">
       <section>
-        <p className="text-[10px] font-bold tracking-[.18em] text-violet-300">AI RECEPTIONIST · SPRINT 6</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[30px]">AI lead qualification</h1>
-        <p className="mt-1.5 max-w-2xl text-sm text-slate-400">Turn unstructured enquiries into organised lead records, suggested replies and transparent qualification scores.</p>
+        <p className="app-page-kicker">AI RECEPTIONIST · SPRINT 6</p>
+        <h1 className="app-page-title">AI lead qualification</h1>
+        <p className="app-page-copy">Turn unstructured enquiries into organised lead records, suggested replies and transparent qualification scores.</p>
       </section>
 
       {params.error && <p className="rounded-xl border border-rose-400/20 bg-rose-400/[.06] px-4 py-3 text-xs text-rose-200">{params.error === "workspace" ? "You do not have access to that active contractor workspace." : params.error === "save" ? "The lead could not be saved. Check workspace permissions." : params.error === "invalid" ? "Enter an inquiry between 10 and 8,000 characters." : params.error}</p>}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <form action={qualifyInquiry} className="rounded-2xl border border-white/[.07] bg-[#111c2e] p-5 sm:p-6">
+        <form action={qualifyInquiry} className="app-surface p-5 sm:p-6">
           <div className="mb-5 flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-xl bg-violet-500/15 text-violet-300"><BrainCircuit size={20} /></span>
             <div><h2 className="text-sm font-semibold text-white">Analyse a customer enquiry</h2><p className="mt-1 text-[10px] text-slate-500">Gemini extracts details; your app calculates the lead score.</p></div>
           </div>
           <label className="block text-[11px] font-medium text-slate-300">Contractor workspace
-            <select name="contractorOrganizationId" required className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#0b1220] px-3 text-xs text-white">
+            <select name="contractorOrganizationId" required className="mt-2 h-11 w-full rounded-xl app-field px-3 text-xs text-white">
               {workspaces.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}
             </select>
           </label>
           <label className="mt-5 block text-[11px] font-medium text-slate-300">Customer inquiry
-            <textarea name="message" required minLength={10} maxLength={8000} rows={10} placeholder="Paste the customer's website enquiry or message here..." className="mt-2 w-full resize-y rounded-xl border border-white/10 bg-[#0b1220] px-3 py-3 text-xs leading-6 text-white placeholder:text-slate-600" />
+            <textarea name="message" required minLength={10} maxLength={8000} rows={10} placeholder="Paste the customer's website enquiry or message here..." className="mt-2 w-full resize-y rounded-xl app-field px-3 py-3 text-xs leading-6 text-white placeholder:text-slate-600" />
           </label>
           <div className="mt-4 flex flex-wrap items-start gap-2 rounded-xl border border-white/[.06] bg-white/[.025] p-3.5 text-[10px] leading-5 text-slate-400">
             <LockKeyhole size={14} className="mt-0.5 shrink-0 text-emerald-300" />
@@ -58,7 +59,8 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
         </form>
 
         <aside className="space-y-3">
-          <section className="rounded-2xl border border-violet-400/15 bg-gradient-to-br from-violet-500/[.12] to-[#111c2e] p-5">
+          <section className="app-surface overflow-hidden bg-gradient-to-br from-[#102d63] via-[#171b56] to-[#27144d] p-5">
+            <div className="mx-auto -mb-1 h-36 max-w-[250px]"><HeroRobot /></div>
             <span className="grid size-9 place-items-center rounded-xl bg-violet-500/20 text-violet-200"><Sparkles size={18} fill="currentColor" /></span>
             <h2 className="mt-4 text-sm font-semibold text-white">From enquiry to opportunity</h2>
             <p className="mt-2 text-[11px] leading-5 text-slate-400">AI helps structure the conversation so your team can focus on the next best action.</p>
@@ -69,7 +71,7 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-300" /> Draft a reply for human review</li>
             </ul>
           </section>
-          <section className="rounded-2xl border border-amber-400/15 bg-amber-400/[.04] p-4">
+          <section className="app-surface-soft p-4">
             <p className="text-[10px] font-semibold text-amber-200">Human approval required</p>
             <p className="mt-1.5 text-[10px] leading-5 text-slate-400">Suggested replies are drafts only. This action does not send email or WhatsApp messages, or book appointments.</p>
           </section>
