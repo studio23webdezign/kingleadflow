@@ -41,7 +41,8 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
             <div><h2 className="text-sm font-semibold text-white">Analyse a customer enquiry</h2><p className="mt-1 text-[10px] text-slate-500">Gemini extracts details; your app calculates the lead score.</p></div>
           </div>
           <label className="block text-[11px] font-medium text-slate-300">Contractor workspace
-            <select name="contractorOrganizationId" required className="mt-2 h-11 w-full rounded-xl app-field px-3 text-xs text-white">
+            <select name="contractorOrganizationId" required disabled={!workspaces.length} className="mt-2 h-11 w-full rounded-xl app-field px-3 text-xs text-white disabled:cursor-not-allowed disabled:opacity-70" defaultValue={workspaces[0]?.id ?? ""}>
+              {!workspaces.length && <option value="" disabled>No contractor workspaces connected</option>}
               {workspaces.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}
             </select>
           </label>
@@ -55,7 +56,7 @@ export default async function AiQualificationPage({ searchParams }: { searchPara
           <button disabled={!workspaces.length} className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 text-xs font-semibold text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40">
             <Sparkles size={15} fill="currentColor" /> Extract, score and save lead
           </button>
-          {!workspaces.length && <p className="mt-3 text-[11px] text-slate-500">Create a contractor workspace or link an active contractor client first.</p>}
+          {!workspaces.length && <div className="mt-4 rounded-xl border border-amber-300/15 bg-amber-300/[.05] p-3.5"><p className="text-[11px] font-semibold text-amber-100">Connect a contractor workspace to continue</p><p className="mt-1 text-[10px] leading-5 text-slate-400">Your agency account does not have an active contractor workspace yet. Add or connect a contractor client, then return here to qualify enquiries for that business.</p><a href="/dashboard/clients" className="mt-3 inline-flex text-[11px] font-semibold text-blue-300 hover:text-blue-200">Open client directory →</a></div>}
         </form>
 
         <aside className="space-y-3">
