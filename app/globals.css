@@ -55,3 +55,12 @@ button,a{-webkit-tap-highlight-color:transparent}
 .kl-action-button:hover{border-color:rgba(120,180,255,.5);background:rgba(37,99,235,.25)}
 .kl-integration-card{min-width:0;border:1px solid rgba(137,174,230,.14);border-radius:16px;background:linear-gradient(145deg,rgba(24,40,72,.9),rgba(12,25,48,.9));padding:13px}
 @media(max-width:480px){.kl-panel{border-radius:17px;padding:15px}.kl-integration-card{padding:11px}}
+
+
+/* Reference-dashboard navigation and responsive refinements */
+.dashboard-nav-scroll{scrollbar-width:thin;scrollbar-color:rgba(92,132,205,.35) transparent}
+.dashboard-brand-crown{color:#f7c84d;filter:drop-shadow(0 2px 8px rgba(245,184,46,.3))}
+@media(max-width:640px){
+  .metric-card{min-height:168px;padding:16px}
+  .metric-card .metric-value{font-size:32px}
+}
